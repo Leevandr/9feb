@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BuyerForm</class>
+ <widget class="QWidget" name="BuyerForm">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>850</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Окно покупателя</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <widget class="QWidget" name="catalog_tab">
+      <attribute name="title"><string>Каталог</string></attribute>
+      <layout class="QVBoxLayout" name="catalog_layout">
+       <item>
+        <layout class="QHBoxLayout" name="filter_layout">
+         <item><widget class="QLineEdit" name="search_edit"><property name="placeholderText"><string>Артикул или название</string></property></widget></item>
+         <item><widget class="QComboBox" name="category_combo"/></item>
+         <item><widget class="QPushButton" name="search_btn"><property name="text"><string>Искать</string></property></widget></item>
+         <item><widget class="QPushButton" name="reset_btn"><property name="text"><string>Сброс</string></property></widget></item>
+        </layout>
+       </item>
+       <item><widget class="QTableWidget" name="catalog_table"/></item>
+       <item><widget class="QPushButton" name="add_to_cart_btn"><property name="text"><string>В корзину</string></property></widget></item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="cart_tab">
+      <attribute name="title"><string>Корзина</string></attribute>
+      <layout class="QVBoxLayout" name="cart_layout">
+       <item><widget class="QTableWidget" name="cart_table"/></item>
+       <item>
+        <layout class="QHBoxLayout" name="cart_btn_layout">
+         <item><widget class="QPushButton" name="remove_from_cart_btn"><property name="text"><string>Удалить из корзины</string></property></widget></item>
+         <item><widget class="QPushButton" name="checkout_btn"><property name="text"><string>Оформить заказ</string></property></widget></item>
+         <item><widget class="QLabel" name="cart_total_label"><property name="text"><string>Итого: 0</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="orders_tab">
+      <attribute name="title"><string>Заказы</string></attribute>
+      <layout class="QVBoxLayout" name="orders_layout">
+       <item><widget class="QTableWidget" name="orders_table"/></item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="profile_tab">
+      <attribute name="title"><string>Личный кабинет</string></attribute>
+      <layout class="QVBoxLayout" name="profile_layout">
+       <item><widget class="QLabel" name="profile_name"><property name="text"><string>Покупатель: buyer</string></property></widget></item>
+       <item><widget class="QLabel" name="profile_orders_count"><property name="text"><string>Заказов: 0</string></property></widget></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

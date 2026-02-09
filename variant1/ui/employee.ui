@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmployeeForm</class>
+ <widget class="QWidget" name="EmployeeForm">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>900</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Окно сотрудника</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item><widget class="QTableWidget" name="table"/></item>
+   <item>
+    <layout class="QHBoxLayout" name="formLayout">
+     <item><widget class="QLineEdit" name="title_edit"><property name="placeholderText"><string>Название</string></property></widget></item>
+     <item><widget class="QLineEdit" name="author_edit"><property name="placeholderText"><string>Автор</string></property></widget></item>
+     <item><widget class="QLineEdit" name="genre_edit"><property name="placeholderText"><string>Жанр</string></property></widget></item>
+     <item><widget class="QLineEdit" name="photo_edit"><property name="placeholderText"><string>Путь к фото</string></property></widget></item>
+     <item><widget class="QPushButton" name="photo_browse_btn"><property name="text"><string>Обзор...</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="btnLayout">
+     <item><widget class="QPushButton" name="add_btn"><property name="text"><string>Добавить</string></property></widget></item>
+     <item><widget class="QPushButton" name="edit_btn"><property name="text"><string>Сохранить изменения</string></property></widget></item>
+     <item><widget class="QPushButton" name="delete_btn"><property name="text"><string>Удалить</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

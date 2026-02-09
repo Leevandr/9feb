@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ReaderForm</class>
+ <widget class="QWidget" name="ReaderForm">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>850</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Окно читателя</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <widget class="QWidget" name="search_tab">
+      <attribute name="title"><string>Поиск</string></attribute>
+      <layout class="QVBoxLayout" name="search_layout">
+       <item>
+        <layout class="QHBoxLayout" name="filter_layout">
+         <item><widget class="QLineEdit" name="author_edit"><property name="placeholderText"><string>Автор</string></property></widget></item>
+         <item><widget class="QComboBox" name="genre_combo"/></item>
+         <item><widget class="QPushButton" name="search_btn"><property name="text"><string>Искать</string></property></widget></item>
+         <item><widget class="QPushButton" name="reset_btn"><property name="text"><string>Сброс</string></property></widget></item>
+        </layout>
+       </item>
+       <item><widget class="QTableWidget" name="table"/></item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="reading_tab">
+      <attribute name="title"><string>Чтение</string></attribute>
+      <layout class="QVBoxLayout" name="reading_layout">
+       <item><widget class="QLabel" name="book_title_label"><property name="text"><string>Выберите книгу в таблице и нажмите 'Читать'</string></property></widget></item>
+       <item><widget class="QPushButton" name="read_btn"><property name="text"><string>Читать выбранную книгу</string></property></widget></item>
+       <item><widget class="QTextEdit" name="text_edit"><property name="readOnly"><bool>true</bool></property></widget></item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="sub_tab">
+      <attribute name="title"><string>Подписки</string></attribute>
+      <layout class="QVBoxLayout" name="sub_layout">
+       <item>
+        <layout class="QHBoxLayout" name="sub_h_layout">
+         <item><widget class="QComboBox" name="sub_genre_combo"/></item>
+         <item><widget class="QPushButton" name="subscribe_btn"><property name="text"><string>Подписаться</string></property></widget></item>
+         <item><widget class="QPushButton" name="unsubscribe_btn"><property name="text"><string>Отписаться</string></property></widget></item>
+        </layout>
+       </item>
+       <item><widget class="QListWidget" name="sub_list"/></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

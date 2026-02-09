@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ManagerRoleForm</class>
+ <widget class="QWidget" name="ManagerRoleForm">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>900</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Окно менеджера</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <widget class="QWidget" name="products_tab">
+      <attribute name="title"><string>Товары</string></attribute>
+      <layout class="QVBoxLayout" name="products_layout">
+       <item><widget class="QTableWidget" name="product_table"/></item>
+       <item>
+        <layout class="QHBoxLayout" name="form_layout">
+         <item><widget class="QLineEdit" name="name_edit"><property name="placeholderText"><string>Наименование</string></property></widget></item>
+         <item><widget class="QLineEdit" name="article_edit"><property name="placeholderText"><string>Артикул</string></property></widget></item>
+         <item><widget class="QLineEdit" name="category_edit"><property name="placeholderText"><string>Категория</string></property></widget></item>
+         <item><widget class="QLineEdit" name="price_edit"><property name="placeholderText"><string>Цена</string></property></widget></item>
+         <item><widget class="QLineEdit" name="desc_edit"><property name="placeholderText"><string>Описание</string></property></widget></item>
+         <item><widget class="QLineEdit" name="photo_edit"><property name="placeholderText"><string>Фото</string></property></widget></item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="btn_layout">
+         <item><widget class="QPushButton" name="add_btn"><property name="text"><string>Добавить</string></property></widget></item>
+         <item><widget class="QPushButton" name="edit_btn"><property name="text"><string>Сохранить</string></property></widget></item>
+         <item><widget class="QPushButton" name="delete_btn"><property name="text"><string>Удалить</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="orders_tab">
+      <attribute name="title"><string>Заказы</string></attribute>
+      <layout class="QVBoxLayout" name="orders_layout">
+       <item><widget class="QTableWidget" name="orders_table"/></item>
+       <item>
+        <layout class="QHBoxLayout" name="orders_btn_layout">
+         <item><widget class="QPushButton" name="accept_btn"><property name="text"><string>Принять заказ</string></property></widget></item>
+         <item><widget class="QPushButton" name="complete_btn"><property name="text"><string>Выполнен</string></property></widget></item>
+         <item><widget class="QPushButton" name="cancel_btn"><property name="text"><string>Отменить</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

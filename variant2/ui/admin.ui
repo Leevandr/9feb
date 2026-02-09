@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdminForm</class>
+ <widget class="QWidget" name="AdminForm">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>800</width><height>550</height></rect></property>
+  <property name="windowTitle"><string>Окно администратора</string></property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <widget class="QWidget" name="users_tab">
+      <attribute name="title"><string>Пользователи</string></attribute>
+      <layout class="QVBoxLayout" name="users_layout">
+       <item><widget class="QTableWidget" name="users_table"/></item>
+       <item>
+        <layout class="QHBoxLayout" name="user_form_layout">
+         <item><widget class="QLineEdit" name="login_edit"><property name="placeholderText"><string>Логин</string></property></widget></item>
+         <item><widget class="QLineEdit" name="password_input"><property name="placeholderText"><string>Пароль</string></property></widget></item>
+         <item><widget class="QComboBox" name="role_combo"/></item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="user_btn_layout">
+         <item><widget class="QPushButton" name="add_user_btn"><property name="text"><string>Добавить</string></property></widget></item>
+         <item><widget class="QPushButton" name="delete_user_btn"><property name="text"><string>Удалить</string></property></widget></item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="stats_tab">
+      <attribute name="title"><string>Статистика продаж</string></attribute>
+      <layout class="QVBoxLayout" name="stats_layout">
+       <item><widget class="QLabel" name="total_orders_label"><property name="text"><string>Всего заказов: 0</string></property></widget></item>
+       <item><widget class="QLabel" name="total_revenue_label"><property name="text"><string>Общая выручка: 0</string></property></widget></item>
+       <item><widget class="QTableWidget" name="stats_table"/></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

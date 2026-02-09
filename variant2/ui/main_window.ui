@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainForm</class>
+ <widget class="QWidget" name="MainForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>800</width><height>600</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Магазин электроники</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="search_edit">
+       <property name="placeholderText"><string>Артикул или название</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="category_combo"/>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="price_min">
+       <property name="maximum"><number>999999</number></property>
+       <property name="prefix"><string>от </string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="price_max">
+       <property name="maximum"><number>999999</number></property>
+       <property name="prefix"><string>до </string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="search_btn">
+       <property name="text"><string>Искать</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset_btn">
+       <property name="text"><string>Сброс</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="auth_btn">
+       <property name="text"><string>Авторизация</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="table"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
