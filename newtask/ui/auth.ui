@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AuthForm</class>
+ <widget class="QWidget" name="AuthForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>400</width><height>350</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Авторизация / Регистрация</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <widget class="QWidget" name="login_tab">
+      <attribute name="title"><string>Вход</string></attribute>
+      <layout class="QVBoxLayout" name="login_layout">
+       <item>
+        <widget class="QLabel" name="login_header">
+         <property name="text"><string>Войти в систему</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+         <property name="font">
+          <font><pointsize>14</pointsize><bold>true</bold></font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="login_email_edit">
+         <property name="placeholderText"><string>E-mail</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="login_password_edit">
+         <property name="placeholderText"><string>Пароль</string></property>
+         <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="login_btn">
+         <property name="text"><string>Войти</string></property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="login_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="register_tab">
+      <attribute name="title"><string>Регистрация</string></attribute>
+      <layout class="QVBoxLayout" name="register_layout">
+       <item>
+        <widget class="QLabel" name="register_header">
+         <property name="text"><string>Создать аккаунт</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+         <property name="font">
+          <font><pointsize>14</pointsize><bold>true</bold></font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="reg_fio_edit">
+         <property name="placeholderText"><string>ФИО</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="reg_email_edit">
+         <property name="placeholderText"><string>E-mail</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="reg_phone_edit">
+         <property name="placeholderText"><string>Телефон</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="reg_password_edit">
+         <property name="placeholderText"><string>Пароль</string></property>
+         <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="reg_password2_edit">
+         <property name="placeholderText"><string>Повторите пароль</string></property>
+         <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="register_btn">
+         <property name="text"><string>Зарегистрироваться</string></property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="register_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

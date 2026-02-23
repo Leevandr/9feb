@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BuyerForm</class>
+ <widget class="QWidget" name="BuyerForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>950</width><height>650</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Личный кабинет покупателя</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+
+     <!-- Вкладка Каталог -->
+     <widget class="QWidget" name="catalog_tab">
+      <attribute name="title"><string>Каталог</string></attribute>
+      <layout class="QVBoxLayout" name="catalog_layout">
+       <item>
+        <layout class="QHBoxLayout" name="cat_filter_1">
+         <item>
+          <widget class="QLineEdit" name="search_edit">
+           <property name="placeholderText"><string>Поиск по названию или производителю</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="category_combo">
+           <property name="minimumSize"><size><width>130</width><height>0</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="material_combo">
+           <property name="minimumSize"><size><width>120</width><height>0</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="purpose_combo">
+           <property name="minimumSize"><size><width>160</width><height>0</height></size></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="cat_filter_2">
+         <item>
+          <widget class="QSpinBox" name="price_min">
+           <property name="maximum"><number>999999</number></property>
+           <property name="prefix"><string>от </string></property>
+           <property name="suffix"><string> руб</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="price_max">
+           <property name="maximum"><number>999999</number></property>
+           <property name="prefix"><string>до </string></property>
+           <property name="suffix"><string> руб</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="search_btn">
+           <property name="text"><string>Искать</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="reset_btn">
+           <property name="text"><string>Сброс</string></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="catalog_table"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="add_to_cart_btn">
+         <property name="text"><string>Добавить в корзину</string></property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- Вкладка Корзина -->
+     <widget class="QWidget" name="cart_tab">
+      <attribute name="title"><string>Корзина</string></attribute>
+      <layout class="QVBoxLayout" name="cart_layout">
+       <item>
+        <widget class="QTableWidget" name="cart_table"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="cart_btn_layout">
+         <item>
+          <widget class="QPushButton" name="plus_btn">
+           <property name="text"><string>+1</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="minus_btn">
+           <property name="text"><string>-1</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remove_btn">
+           <property name="text"><string>Удалить</string></property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="cart_spacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="cart_total_label">
+           <property name="text"><string>Итого: 0 руб</string></property>
+           <property name="font">
+            <font><pointsize>12</pointsize><bold>true</bold></font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="checkout_btn">
+         <property name="text"><string>Оформить заказ</string></property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- Вкладка Заказы -->
+     <widget class="QWidget" name="orders_tab">
+      <attribute name="title"><string>Мои заказы</string></attribute>
+      <layout class="QVBoxLayout" name="orders_layout">
+       <item>
+        <widget class="QTableWidget" name="orders_table"/>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- Вкладка Профиль -->
+     <widget class="QWidget" name="profile_tab">
+      <attribute name="title"><string>Профиль</string></attribute>
+      <layout class="QVBoxLayout" name="profile_layout">
+       <item>
+        <widget class="QLabel" name="profile_fio">
+         <property name="text"><string>ФИО: </string></property>
+         <property name="font"><font><pointsize>11</pointsize></font></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="profile_email">
+         <property name="text"><string>E-mail: </string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="profile_phone">
+         <property name="text"><string>Телефон: </string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="profile_orders_count">
+         <property name="text"><string>Заказов: 0</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="addresses_header">
+         <property name="text"><string>Сохранённые адреса доставки:</string></property>
+         <property name="font"><font><bold>true</bold></font></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="addresses_list"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="address_add_layout">
+         <item>
+          <widget class="QLineEdit" name="new_address_edit">
+           <property name="placeholderText"><string>Новый адрес доставки</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="add_address_btn">
+           <property name="text"><string>Добавить адрес</string></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="profile_spacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

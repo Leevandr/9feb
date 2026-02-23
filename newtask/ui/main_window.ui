@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainForm</class>
+ <widget class="QWidget" name="MainForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>900</width><height>650</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Магазин канцелярии</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="filter_layout_1">
+     <item>
+      <widget class="QLineEdit" name="search_edit">
+       <property name="placeholderText"><string>Поиск по названию или производителю</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="category_combo">
+       <property name="minimumSize"><size><width>130</width><height>0</height></size></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="material_combo">
+       <property name="minimumSize"><size><width>120</width><height>0</height></size></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="purpose_combo">
+       <property name="minimumSize"><size><width>160</width><height>0</height></size></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="filter_layout_2">
+     <item>
+      <widget class="QSpinBox" name="price_min">
+       <property name="maximum"><number>999999</number></property>
+       <property name="prefix"><string>от </string></property>
+       <property name="suffix"><string> руб</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="price_max">
+       <property name="maximum"><number>999999</number></property>
+       <property name="prefix"><string>до </string></property>
+       <property name="suffix"><string> руб</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="search_btn">
+       <property name="text"><string>Искать</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset_btn">
+       <property name="text"><string>Сброс</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add_to_cart_btn">
+       <property name="text"><string>В корзину</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cart_btn">
+       <property name="text"><string>Корзина (0)</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="auth_btn">
+       <property name="text"><string>Авторизация</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="table"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="count_label">
+     <property name="text"><string>Товаров: 0</string></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
