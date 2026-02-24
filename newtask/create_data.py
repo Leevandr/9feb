@@ -1,84 +1,196 @@
 """
 Скрипт инициализации базы данных аптеки.
 Создаёт SQLite-базу pharmacy.db с таблицами, тестовыми данными
-и генерирует изображения-заглушки для препаратов.
+и генерирует изображения упаковок через Pillow.
 """
 import os
 import sqlite3
-import struct
-import zlib
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'pharmacy.db')
 PHOTOS_DIR = os.path.join(BASE_DIR, 'photos')
 
+# Цвета по группам заболеваний: (accent_hex, pastel_hex)
+COLORS = {
+    'Сердечно-сосудистые': ('#E74C3C', '#FADBD8'),
+    'Обезболивающие': ('#3498DB', '#D6EAF8'),
+    'Антибиотики': ('#E67E22', '#FDEBD0'),
+    'ЛОР': ('#1ABC9C', '#D1F2EB'),
+    'ЖКТ': ('#9B59B6', '#E8DAEF'),
+    'Антигистаминные': ('#F39C12', '#FEF9E7'),
+    'Ранозаживляющие': ('#27AE60', '#D5F5E3'),
+    'Витамины': ('#F1C40F', '#FEF5D4'),
+    'Уход за кожей': ('#E91E8C', '#FDE'),
+    'Антисептики': ('#2E86C1', '#D4E6F1'),
+}
 
-def create_medicine_png(width, height, r, g, b):
-    """Создаёт PNG — цветной фон с белым медицинским крестом."""
-    def chunk(chunk_type, data):
-        c = chunk_type + data
-        return (struct.pack('>I', len(data)) + c +
-                struct.pack('>I', zlib.crc32(c) & 0xffffffff))
+FONT_PATHS = [
+    '/System/Library/Fonts/Helvetica.ttc',
+    '/System/Library/Fonts/HelveticaNeue.ttc',
+    '/System/Library/Fonts/ArialHB.ttc',
+    '/System/Library/Fonts/Geneva.ttf',
+    '/System/Library/Fonts/LucidaGrande.ttc',
+]
 
-    sig = b'\x89PNG\r\n\x1a\n'
-    ihdr = struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)
 
-    cx, cy = width // 2, height // 2
-    arm_w = width // 6
-    arm_h = height // 3
-
-    raw = b''
-    for y in range(height):
-        raw += b'\x00'
-        for x in range(width):
-            in_cross = False
-            if cx - arm_w <= x <= cx + arm_w and cy - arm_h <= y <= cy + arm_h:
-                in_cross = True
-            if cy - arm_w <= y <= cy + arm_w and cx - arm_h <= x <= cx + arm_h:
-                in_cross = True
-
-            if x < 3 or x >= width - 3 or y < 3 or y >= height - 3:
-                raw += struct.pack('BBB',
-                                   max(r - 50, 0), max(g - 50, 0), max(b - 50, 0))
-            elif in_cross:
-                raw += struct.pack('BBB', 255, 255, 255)
-            else:
-                raw += struct.pack('BBB', r, g, b)
-
-    idat = zlib.compress(raw)
-    return sig + chunk(b'IHDR', ihdr) + chunk(b'IDAT', idat) + chunk(b'IEND', b'')
+def hex_to_rgb(h):
+    h = h.lstrip('#')
+    if len(h) == 3:
+        h = h[0]*2 + h[1]*2 + h[2]*2
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
 
 def generate_photos(products_data):
-    """Генерирует фото-заглушки для каждого препарата."""
+    """Генерирует изображения упаковок лекарств через Pillow."""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError:
+        print('Pillow не установлен, изображения не созданы')
+        return
+
     os.makedirs(PHOTOS_DIR, exist_ok=True)
 
-    colors = {
-        'Сердечно-сосудистые': (220, 80, 80),
-        'Обезболивающие': (80, 140, 220),
-        'Антибиотики': (220, 180, 60),
-        'ЛОР': (100, 200, 180),
-        'ЖКТ': (180, 120, 200),
-        'Антигистаминные': (200, 160, 100),
-        'Ранозаживляющие': (120, 200, 120),
-        'Витамины': (240, 200, 80),
-        'Седативные': (160, 180, 220),
-        'От кашля': (180, 200, 140),
-        'Уход за кожей': (240, 180, 200),
-        'Антисептики': (100, 180, 220),
-        'Медизделия': (200, 200, 200),
-    }
+    # Ищем шрифт с поддержкой кириллицы
+    font_path = None
+    for fp in FONT_PATHS:
+        if os.path.exists(fp):
+            font_path = fp
+            break
+
+    def get_font(size):
+        if font_path:
+            try:
+                return ImageFont.truetype(font_path, size)
+            except Exception:
+                pass
+        return ImageFont.load_default()
 
     for product in products_data:
-        photo_name = product[1]
+        filename = product[1].replace('photos/', '')
+        name = product[0]
+        form = product[3]
         disease = product[6]
-        color = colors.get(disease, (180, 180, 180))
 
-        path = os.path.join(BASE_DIR, photo_name)
-        if not os.path.exists(path):
-            png_data = create_medicine_png(64, 64, *color)
-            with open(path, 'wb') as f:
-                f.write(png_data)
+        accent = hex_to_rgb(COLORS.get(disease, ('#888', '#EEE'))[0])
+        darker = tuple(max(0, c - 50) for c in accent)
+
+        w, h = 250, 250
+        img = Image.new('RGB', (w, h), (248, 249, 252))
+        draw = ImageDraw.Draw(img)
+
+        # Тень коробки
+        draw.rounded_rectangle(
+            [20, 20, w - 10, h - 48], radius=16,
+            fill=(215, 218, 225))
+
+        # Коробка лекарства
+        draw.rounded_rectangle(
+            [15, 15, w - 15, h - 52], radius=16, fill=accent)
+
+        # Белая этикетка
+        draw.rounded_rectangle(
+            [30, 55, w - 30, h - 72], radius=10, fill='white')
+
+        # Медицинский крест (белый, левый верхний угол коробки)
+        cx_c, cy_c = 38, 35
+        draw.rectangle(
+            [cx_c - 3, cy_c - 10, cx_c + 3, cy_c + 10], fill='white')
+        draw.rectangle(
+            [cx_c - 10, cy_c - 3, cx_c + 10, cy_c + 3], fill='white')
+
+        # Иконка формы (правый верхний угол, цветной кружок)
+        badge_x, badge_y = w - 50, 35
+        draw.ellipse(
+            [badge_x - 14, badge_y - 14, badge_x + 14, badge_y + 14],
+            fill='white')
+
+        # Простая иконка формы внутри кружка
+        if form in ('Таблетки', 'Шипучие таблетки'):
+            # Таблетка (овал с линией)
+            draw.ellipse(
+                [badge_x - 9, badge_y - 5, badge_x + 9, badge_y + 5],
+                fill=accent)
+            draw.line(
+                [(badge_x, badge_y - 5), (badge_x, badge_y + 5)],
+                fill='white', width=1)
+        elif form == 'Капсулы':
+            draw.rounded_rectangle(
+                [badge_x - 10, badge_y - 4, badge_x + 10, badge_y + 4],
+                radius=4, fill=accent)
+            draw.rectangle(
+                [badge_x, badge_y - 4, badge_x + 10, badge_y + 4],
+                fill=darker)
+        elif form in ('Капли', 'Спрей', 'Сироп', 'Раствор'):
+            # Бутылочка
+            draw.rectangle(
+                [badge_x - 5, badge_y - 2, badge_x + 5, badge_y + 10],
+                fill=accent)
+            draw.rectangle(
+                [badge_x - 2, badge_y - 8, badge_x + 2, badge_y - 2],
+                fill=accent)
+        elif form in ('Мазь', 'Гель', 'Крем'):
+            # Тюбик
+            draw.rectangle(
+                [badge_x - 8, badge_y - 3, badge_x + 5, badge_y + 3],
+                fill=accent)
+            draw.polygon(
+                [(badge_x + 5, badge_y - 2),
+                 (badge_x + 10, badge_y),
+                 (badge_x + 5, badge_y + 2)],
+                fill=darker)
+        else:
+            draw.rectangle(
+                [badge_x - 2, badge_y - 7, badge_x + 2, badge_y + 7],
+                fill=accent)
+            draw.rectangle(
+                [badge_x - 7, badge_y - 2, badge_x + 7, badge_y + 2],
+                fill=accent)
+
+        # Название на этикетке
+        font_name = get_font(17)
+        display = name if len(name) <= 15 else name[:14] + '.'
+        bbox = draw.textbbox((0, 0), display, font=font_name)
+        tw = bbox[2] - bbox[0]
+        draw.text(
+            ((w - tw) // 2, 65), display,
+            fill=darker, font=font_name)
+
+        # Форма выпуска на этикетке
+        font_form = get_font(12)
+        bbox2 = draw.textbbox((0, 0), form, font=font_form)
+        tw2 = bbox2[2] - bbox2[0]
+        draw.text(
+            ((w - tw2) // 2, 92), form,
+            fill=(130, 130, 130), font=font_form)
+
+        # Инструкция (мелким шрифтом на этикетке)
+        instruction = product[2]
+        font_instr = get_font(9)
+        short_instr = instruction if len(instruction) <= 35 \
+            else instruction[:34] + '.'
+        bbox3 = draw.textbbox((0, 0), short_instr, font=font_instr)
+        tw3 = bbox3[2] - bbox3[0]
+        draw.text(
+            ((w - tw3) // 2, 115), short_instr,
+            fill=(160, 160, 160), font=font_instr)
+
+        # Группа заболеваний (под коробкой)
+        font_group = get_font(11)
+        draw.text((15, h - 40), disease, fill=(140, 140, 145), font=font_group)
+
+        # Цена (справа под коробкой)
+        price_text = f'{product[4]:.0f} руб'
+        font_price = get_font(13)
+        bbox4 = draw.textbbox((0, 0), price_text, font=font_price)
+        tw4 = bbox4[2] - bbox4[0]
+        draw.text(
+            (w - tw4 - 15, h - 40), price_text,
+            fill=accent, font=font_price)
+
+        path = os.path.join(PHOTOS_DIR, filename)
+        img.save(path, 'PNG')
+
+    print(f'Создано {len(products_data)} изображений в {PHOTOS_DIR}')
 
 
 def create_database():
@@ -88,7 +200,6 @@ def create_database():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    # ---------- Таблица препаратов ----------
     cur.execute('''
         CREATE TABLE products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,7 +215,6 @@ def create_database():
         )
     ''')
 
-    # ---------- Таблица пользователей ----------
     cur.execute('''
         CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,7 +225,6 @@ def create_database():
         )
     ''')
 
-    # ---------- Таблица адресов ----------
     cur.execute('''
         CREATE TABLE addresses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -125,22 +234,20 @@ def create_database():
         )
     ''')
 
-    # ---------- Таблица заказов ----------
     cur.execute('''
         CREATE TABLE orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            payment_method TEXT DEFAULT 'Наличные',
+            payment_method TEXT DEFAULT '',
             delivery_address TEXT DEFAULT '',
             total REAL DEFAULT 0,
-            status TEXT DEFAULT 'Новый',
+            status TEXT DEFAULT '',
             order_date TEXT DEFAULT '',
             delivery_date TEXT DEFAULT '',
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
 
-    # ---------- Таблица позиций заказа ----------
     cur.execute('''
         CREATE TABLE order_items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -153,159 +260,79 @@ def create_database():
         )
     ''')
 
-    # ========== Тестовые данные ==========
-    # (name, photo, instruction, release_form, price,
-    #  manufacturer, disease_group, prescription, active_ingredient)
+    # 12 препаратов (фото только у тех, для которых есть реальные изображения)
     products = [
-        ('Аспирин', 'photos/aspirin.png',
+        ('Аспирин', 'photos/аспирин.png',
          'По 1 таблетке после еды',
          'Таблетки', 120, 'Bayer (Импортный)',
          'Сердечно-сосудистые', 'Безрецептурный',
          'Ацетилсалициловая кислота'),
 
-        ('Парацетамол', 'photos/paracetamol.png',
+        ('Парацетамол', '',
          'По 1-2 табл. до 4 раз/сутки',
          'Таблетки', 45, 'Фармстандарт (Отечественный)',
          'Обезболивающие', 'Безрецептурный',
          'Парацетамол'),
 
-        ('Амоксициллин', 'photos/amoxicillin.png',
-         'По 500 мг 3 раза/сутки, курс 7 дней',
+        ('Амоксициллин', '',
+         'По 500 мг 3 раза/сутки, 7 дней',
          'Капсулы', 180, 'АВВА РУС (Отечественный)',
          'Антибиотики', 'Рецептурный',
          'Амоксициллин'),
 
-        ('Ибупрофен', 'photos/ibuprofen.png',
-         'По 200-400 мг до 3 раз/сутки после еды',
-         'Таблетки', 95, 'Синтез (Отечественный)',
-         'Обезболивающие', 'Безрецептурный',
-         'Ибупрофен'),
-
-        ('Нафтизин', 'photos/naphthyzin.png',
+        ('Нафтизин', '',
          'По 1-3 капли в нос 3 раза/сутки',
          'Капли', 35, 'Славянская аптека (Отечественный)',
          'ЛОР', 'Безрецептурный',
          'Нафазолин'),
 
-        ('Мезим форте', 'photos/mezim.png',
+        ('Мезим форте', 'photos/mezzm.png',
          'По 1-2 табл. во время еды',
          'Таблетки', 280, 'Berlin-Chemie (Импортный)',
          'ЖКТ', 'Безрецептурный',
          'Панкреатин'),
 
-        ('Лоратадин', 'photos/loratadin.png',
+        ('Лоратадин', '',
          'По 1 табл. 1 раз/сутки',
          'Таблетки', 60, 'Вертекс (Отечественный)',
          'Антигистаминные', 'Безрецептурный',
          'Лоратадин'),
 
-        ('Левомеколь', 'photos/levomekol.png',
+        ('Левомеколь', '',
          'Наносить на рану 1-2 раза/сутки',
          'Мазь', 130, 'Нижфарм (Отечественный)',
          'Ранозаживляющие', 'Безрецептурный',
          'Хлорамфеникол + Метилурацил'),
 
-        ('Витамин С 1000 мг', 'photos/vitamin_c.png',
-         '1 шипучую табл. в стакане воды 1 раз/сутки',
+        ('Витамин С', 'photos/витаминц.png',
+         '1 табл. в стакане воды 1 раз/сутки',
          'Шипучие таблетки', 350, 'Bayer (Импортный)',
          'Витамины', 'Безрецептурный',
          'Аскорбиновая кислота'),
 
-        ('Валерианы экстракт', 'photos/valerian.png',
-         'По 1-2 табл. 3 раза/сутки',
-         'Таблетки', 75, 'Фармстандарт (Отечественный)',
-         'Седативные', 'Безрецептурный',
-         'Валерианы экстракт'),
-
-        ('Називин', 'photos/nazivin.png',
-         'По 1 впрыскиванию в нос 2-3 раза/сутки',
+        ('Називин', '',
+         'По 1 впрыскиванию 2-3 раза/сутки',
          'Спрей', 190, 'Merck (Импортный)',
          'ЛОР', 'Безрецептурный',
          'Оксиметазолин'),
 
-        ('Омепразол', 'photos/omeprazol.png',
-         'По 1 капсуле утром натощак',
-         'Капсулы', 85, 'Озон (Отечественный)',
-         'ЖКТ', 'Безрецептурный',
-         'Омепразол'),
-
-        ('Диклофенак', 'photos/diclofenac.png',
-         'Тонким слоем на больной участок 3-4 раза/сутки',
-         'Гель', 150, 'Хемофарм (Импортный)',
-         'Обезболивающие', 'Безрецептурный',
-         'Диклофенак натрия'),
-
-        ('Амброксол', 'photos/ambroxol.png',
-         'По 10 мл сиропа 3 раза/сутки',
-         'Сироп', 120, 'Фармстандарт (Отечественный)',
-         'От кашля', 'Безрецептурный',
-         'Амброксол'),
-
-        ('Цетиризин', 'photos/cetirizin.png',
-         'По 1 табл. 1 раз/сутки вечером',
-         'Таблетки', 110, 'Др. Редди (Импортный)',
-         'Антигистаминные', 'Безрецептурный',
-         'Цетиризин'),
-
-        ('Бепантен', 'photos/bepanthen.png',
+        ('Бепантен', '',
          'Тонким слоем 1-2 раза/сутки',
          'Крем', 520, 'Bayer (Импортный)',
          'Уход за кожей', 'Безрецептурный',
          'Декспантенол'),
 
-        ('Фурацилин', 'photos/furacilin.png',
-         '1 табл. на 100 мл воды для полоскания',
-         'Раствор', 55, 'Авексима (Отечественный)',
-         'Антисептики', 'Безрецептурный',
-         'Нитрофурал'),
-
-        ('Корвалол', 'photos/corvalol.png',
-         'По 15-30 капель 2-3 раза/сутки до еды',
-         'Капли', 25, 'Фармстандарт (Отечественный)',
-         'Сердечно-сосудистые', 'Безрецептурный',
-         'Фенобарбитал + Этилбромизовалерианат'),
-
-        ('Мирамистин', 'photos/miramistin.png',
-         'Орошать поверхность 3-4 раза/сутки',
+        ('Мирамистин', '',
+         'Орошать 3-4 раза/сутки',
          'Раствор', 380, 'Инфамед (Отечественный)',
          'Антисептики', 'Безрецептурный',
          'Бензилдиметил'),
 
-        ('Смекта', 'photos/smecta.png',
-         '1 пакетик на 50 мл воды, 3 раза/сутки',
-         'Порошок', 160, 'Ipsen (Импортный)',
-         'ЖКТ', 'Безрецептурный',
-         'Смектит диоктаэдрический'),
-
-        ('Анальгин', 'photos/analgin.png',
-         'По 1 табл. 2-3 раза/сутки после еды',
-         'Таблетки', 30, 'Фармстандарт (Отечественный)',
-         'Обезболивающие', 'Безрецептурный',
-         'Метамизол натрия'),
-
-        ('Супрастин', 'photos/suprastin.png',
-         'По 1 табл. 3-4 раза/сутки во время еды',
-         'Таблетки', 140, 'Egis (Импортный)',
-         'Антигистаминные', 'Рецептурный',
-         'Хлоропирамин'),
-
-        ('Нурофен', 'photos/nurofen.png',
-         'По 5-10 мл суспензии 3 раза/сутки',
+        ('Нурофен', '',
+         'По 5-10 мл 3 раза/сутки',
          'Сироп', 250, 'Reckitt Benckiser (Импортный)',
          'Обезболивающие', 'Безрецептурный',
          'Ибупрофен'),
-
-        ('Пластырь бактерицидный', 'photos/plaster.png',
-         'Наклеить на чистую сухую кожу',
-         'Пластырь', 65, 'Мастер Юни (Отечественный)',
-         'Медизделия', 'Безрецептурный',
-         '—'),
-
-        ('Бинт медицинский', 'photos/bandage.png',
-         'Для перевязки ран и фиксации повязок',
-         'Медизделие', 40, 'Клинса (Отечественный)',
-         'Медизделия', 'Безрецептурный',
-         '—'),
     ]
 
     cur.executemany('''
@@ -315,16 +342,11 @@ def create_database():
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', products)
 
-    # Генерация фото-заглушек
-    generate_photos(products)
-
-    # Тестовый пользователь
     cur.execute('''
         INSERT INTO users (fio, email, phone, password)
         VALUES (?, ?, ?, ?)
     ''', ('Иванов Иван Иванович', 'buyer@test.ru', '+79001234567', '1'))
 
-    # Тестовый адрес
     cur.execute('''
         INSERT INTO addresses (user_id, address)
         VALUES (?, ?)
