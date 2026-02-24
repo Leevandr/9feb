@@ -4,27 +4,32 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainForm(object):
     def setupUi(self, MainForm):
         MainForm.setObjectName("MainForm")
-        MainForm.resize(900, 650)
+        MainForm.resize(1050, 700)
         self.verticalLayout = QtWidgets.QVBoxLayout(MainForm)
         self.verticalLayout.setObjectName("verticalLayout")
 
         # --- Строка фильтров 1 ---
         self.filter_layout_1 = QtWidgets.QHBoxLayout()
         self.search_edit = QtWidgets.QLineEdit(MainForm)
-        self.search_edit.setPlaceholderText("Поиск по названию или производителю")
+        self.search_edit.setPlaceholderText(
+            "Поиск по названию или действующему веществу")
         self.filter_layout_1.addWidget(self.search_edit)
 
-        self.category_combo = QtWidgets.QComboBox(MainForm)
-        self.category_combo.setMinimumWidth(130)
-        self.filter_layout_1.addWidget(self.category_combo)
+        self.disease_combo = QtWidgets.QComboBox(MainForm)
+        self.disease_combo.setMinimumWidth(170)
+        self.filter_layout_1.addWidget(self.disease_combo)
 
-        self.material_combo = QtWidgets.QComboBox(MainForm)
-        self.material_combo.setMinimumWidth(120)
-        self.filter_layout_1.addWidget(self.material_combo)
+        self.form_combo = QtWidgets.QComboBox(MainForm)
+        self.form_combo.setMinimumWidth(130)
+        self.filter_layout_1.addWidget(self.form_combo)
 
-        self.purpose_combo = QtWidgets.QComboBox(MainForm)
-        self.purpose_combo.setMinimumWidth(160)
-        self.filter_layout_1.addWidget(self.purpose_combo)
+        self.manufacturer_combo = QtWidgets.QComboBox(MainForm)
+        self.manufacturer_combo.setMinimumWidth(160)
+        self.filter_layout_1.addWidget(self.manufacturer_combo)
+
+        self.prescription_combo = QtWidgets.QComboBox(MainForm)
+        self.prescription_combo.setMinimumWidth(150)
+        self.filter_layout_1.addWidget(self.prescription_combo)
 
         self.verticalLayout.addLayout(self.filter_layout_1)
 
@@ -70,7 +75,7 @@ class Ui_MainForm(object):
         self.verticalLayout.addWidget(self.table)
 
         # --- Счётчик ---
-        self.count_label = QtWidgets.QLabel("Товаров: 0", MainForm)
+        self.count_label = QtWidgets.QLabel("Препаратов: 0", MainForm)
         self.verticalLayout.addWidget(self.count_label)
 
         self.retranslateUi(MainForm)
@@ -78,4 +83,5 @@ class Ui_MainForm(object):
 
     def retranslateUi(self, MainForm):
         _translate = QtCore.QCoreApplication.translate
-        MainForm.setWindowTitle(_translate("MainForm", "Магазин канцелярии"))
+        MainForm.setWindowTitle(
+            _translate("MainForm", "Аптека — Каталог препаратов"))

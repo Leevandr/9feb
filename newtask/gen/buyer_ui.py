@@ -4,7 +4,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_BuyerForm(object):
     def setupUi(self, BuyerForm):
         BuyerForm.setObjectName("BuyerForm")
-        BuyerForm.resize(950, 650)
+        BuyerForm.resize(1050, 700)
         self.mainLayout = QtWidgets.QVBoxLayout(BuyerForm)
 
         self.tabs = QtWidgets.QTabWidget(BuyerForm)
@@ -15,20 +15,25 @@ class Ui_BuyerForm(object):
 
         self.cat_filter_1 = QtWidgets.QHBoxLayout()
         self.search_edit = QtWidgets.QLineEdit(self.catalog_tab)
-        self.search_edit.setPlaceholderText("Поиск по названию или производителю")
+        self.search_edit.setPlaceholderText(
+            "Поиск по названию или действующему веществу")
         self.cat_filter_1.addWidget(self.search_edit)
 
-        self.category_combo = QtWidgets.QComboBox(self.catalog_tab)
-        self.category_combo.setMinimumWidth(130)
-        self.cat_filter_1.addWidget(self.category_combo)
+        self.disease_combo = QtWidgets.QComboBox(self.catalog_tab)
+        self.disease_combo.setMinimumWidth(170)
+        self.cat_filter_1.addWidget(self.disease_combo)
 
-        self.material_combo = QtWidgets.QComboBox(self.catalog_tab)
-        self.material_combo.setMinimumWidth(120)
-        self.cat_filter_1.addWidget(self.material_combo)
+        self.form_combo = QtWidgets.QComboBox(self.catalog_tab)
+        self.form_combo.setMinimumWidth(130)
+        self.cat_filter_1.addWidget(self.form_combo)
 
-        self.purpose_combo = QtWidgets.QComboBox(self.catalog_tab)
-        self.purpose_combo.setMinimumWidth(160)
-        self.cat_filter_1.addWidget(self.purpose_combo)
+        self.manufacturer_combo = QtWidgets.QComboBox(self.catalog_tab)
+        self.manufacturer_combo.setMinimumWidth(160)
+        self.cat_filter_1.addWidget(self.manufacturer_combo)
+
+        self.prescription_combo = QtWidgets.QComboBox(self.catalog_tab)
+        self.prescription_combo.setMinimumWidth(150)
+        self.cat_filter_1.addWidget(self.prescription_combo)
 
         self.catalog_layout.addLayout(self.cat_filter_1)
 
@@ -57,7 +62,8 @@ class Ui_BuyerForm(object):
         self.catalog_table = QtWidgets.QTableWidget(self.catalog_tab)
         self.catalog_layout.addWidget(self.catalog_table)
 
-        self.add_to_cart_btn = QtWidgets.QPushButton("Добавить в корзину", self.catalog_tab)
+        self.add_to_cart_btn = QtWidgets.QPushButton(
+            "Добавить в корзину", self.catalog_tab)
         self.catalog_layout.addWidget(self.add_to_cart_btn)
 
         self.tabs.addTab(self.catalog_tab, "Каталог")
@@ -94,7 +100,8 @@ class Ui_BuyerForm(object):
 
         self.cart_layout.addLayout(self.cart_btn_layout)
 
-        self.checkout_btn = QtWidgets.QPushButton("Оформить заказ", self.cart_tab)
+        self.checkout_btn = QtWidgets.QPushButton(
+            "Оформить заказ", self.cart_tab)
         self.cart_layout.addWidget(self.checkout_btn)
 
         self.tabs.addTab(self.cart_tab, "Корзина")
@@ -124,7 +131,8 @@ class Ui_BuyerForm(object):
         self.profile_phone = QtWidgets.QLabel("Телефон: ", self.profile_tab)
         self.profile_layout.addWidget(self.profile_phone)
 
-        self.profile_orders_count = QtWidgets.QLabel("Заказов: 0", self.profile_tab)
+        self.profile_orders_count = QtWidgets.QLabel(
+            "Заказов: 0", self.profile_tab)
         self.profile_layout.addWidget(self.profile_orders_count)
 
         self.addresses_header = QtWidgets.QLabel(
@@ -142,7 +150,8 @@ class Ui_BuyerForm(object):
         self.new_address_edit.setPlaceholderText("Новый адрес доставки")
         self.address_add_layout.addWidget(self.new_address_edit)
 
-        self.add_address_btn = QtWidgets.QPushButton("Добавить адрес", self.profile_tab)
+        self.add_address_btn = QtWidgets.QPushButton(
+            "Добавить адрес", self.profile_tab)
         self.address_add_layout.addWidget(self.add_address_btn)
 
         self.profile_layout.addLayout(self.address_add_layout)
@@ -158,4 +167,4 @@ class Ui_BuyerForm(object):
     def retranslateUi(self, BuyerForm):
         _translate = QtCore.QCoreApplication.translate
         BuyerForm.setWindowTitle(
-            _translate("BuyerForm", "Личный кабинет покупателя"))
+            _translate("BuyerForm", "Аптека — Личный кабинет"))

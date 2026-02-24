@@ -5,13 +5,14 @@ from datetime import datetime, timedelta
 
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 
 from gen.main_ui import Ui_MainForm
 from gen.auth_ui import Ui_AuthForm
 from gen.buyer_ui import Ui_BuyerForm
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'shop.db')
+DB_PATH = os.path.join(BASE_DIR, 'pharmacy.db')
 
 
 # ============================================================
@@ -39,6 +40,20 @@ def get_unique_values(column):
     return [r[0] for r in rows if r[0]]
 
 
+def make_photo_label(photo_path, size=50):
+    """Создаёт QLabel с изображением для вставки в таблицу."""
+    lbl = QLabel()
+    lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    full = os.path.join(BASE_DIR, photo_path) if photo_path else ''
+    if full and os.path.exists(full):
+        pix = QPixmap(full).scaled(
+            size, size,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+        lbl.setPixmap(pix)
+    return lbl
+
+
 # ============================================================
 #  Общая корзина (in-memory, передаётся между окнами)
 #  Формат: [{product_id, name, price, quantity}, ...]
@@ -64,47 +79,68 @@ class MainWindow(QWidget):
         self.ui.auth_btn.clicked.connect(self.open_auth)
         self.ui.add_to_cart_btn.clicked.connect(self.add_to_cart)
         self.ui.cart_btn.clicked.connect(self.show_cart_dialog)
-        self.ui.table.doubleClicked.connect(self.show_photo)
-        self.ui.table.setSortingEnabled(True)
 
     def fill_filters(self):
-        cats = get_unique_values('category')
-        self.ui.category_combo.clear()
-        self.ui.category_combo.addItem('Все типы')
-        self.ui.category_combo.addItems(cats)
+        groups = get_unique_values('disease_group')
+        self.ui.disease_combo.clear()
+        self.ui.disease_combo.addItem('Все группы')
+        self.ui.disease_combo.addItems(groups)
 
-        mats = get_unique_values('material')
-        self.ui.material_combo.clear()
-        self.ui.material_combo.addItem('Все материалы')
-        self.ui.material_combo.addItems(mats)
+        forms = get_unique_values('release_form')
+        self.ui.form_combo.clear()
+        self.ui.form_combo.addItem('Все формы')
+        self.ui.form_combo.addItems(forms)
 
-        purposes = get_unique_values('purpose')
-        self.ui.purpose_combo.clear()
-        self.ui.purpose_combo.addItem('Все назначения')
-        self.ui.purpose_combo.addItems(purposes)
+        self.ui.manufacturer_combo.clear()
+        self.ui.manufacturer_combo.addItem('Все производители')
+        self.ui.manufacturer_combo.addItem('Отечественный')
+        self.ui.manufacturer_combo.addItem('Импортный')
+
+        self.ui.prescription_combo.clear()
+        self.ui.prescription_combo.addItem('Все')
+        self.ui.prescription_combo.addItem('Рецептурный')
+        self.ui.prescription_combo.addItem('Безрецептурный')
 
     def fill_table(self, data):
-        self.ui.table.setSortingEnabled(False)
         self.ui.table.setRowCount(len(data))
-        self.ui.table.setColumnCount(6)
+        self.ui.table.setColumnCount(7)
         self.ui.table.setHorizontalHeaderLabels(
-            ['Наименование', 'Материал', 'Цена', 'Производитель', 'Тип', 'Фото'])
+            ['Фото', 'Название', 'Инструкция', 'Форма выпуска',
+             'Цена', 'Группа', 'Рецепт'])
+        self.ui.table.setColumnWidth(0, 60)
+        self.ui.table.setColumnWidth(1, 150)
+        self.ui.table.setColumnWidth(2, 280)
+        self.ui.table.setColumnWidth(3, 120)
+        self.ui.table.setColumnWidth(4, 80)
+        self.ui.table.setColumnWidth(5, 160)
+        self.ui.table.setColumnWidth(6, 130)
+
         for i, p in enumerate(data):
-            self.ui.table.setItem(i, 0, QTableWidgetItem(p['name']))
-            self.ui.table.setItem(i, 1, QTableWidgetItem(p['material']))
-            self.ui.table.setItem(i, 2, QTableWidgetItem(str(p['price'])))
-            self.ui.table.setItem(i, 3, QTableWidgetItem(p['manufacturer']))
-            self.ui.table.setItem(i, 4, QTableWidgetItem(p['category']))
-            self.ui.table.setItem(i, 5, QTableWidgetItem(p['photo']))
-        self.ui.table.setSortingEnabled(True)
-        self.ui.count_label.setText(f'Товаров: {len(data)}')
+            self.ui.table.setRowHeight(i, 58)
+            self.ui.table.setCellWidget(
+                i, 0, make_photo_label(p['photo']))
+            self.ui.table.setItem(
+                i, 1, QTableWidgetItem(p['name']))
+            self.ui.table.setItem(
+                i, 2, QTableWidgetItem(p['instruction']))
+            self.ui.table.setItem(
+                i, 3, QTableWidgetItem(p['release_form']))
+            self.ui.table.setItem(
+                i, 4, QTableWidgetItem(str(p['price'])))
+            self.ui.table.setItem(
+                i, 5, QTableWidgetItem(p['disease_group']))
+            self.ui.table.setItem(
+                i, 6, QTableWidgetItem(p['prescription']))
+
+        self.ui.count_label.setText(f'Препаратов: {len(data)}')
 
     # ---------- Поиск / фильтрация ----------
     def search(self):
         text = self.ui.search_edit.text().strip().lower()
-        category = self.ui.category_combo.currentText()
-        material = self.ui.material_combo.currentText()
-        purpose = self.ui.purpose_combo.currentText()
+        disease = self.ui.disease_combo.currentText()
+        form = self.ui.form_combo.currentText()
+        mfr = self.ui.manufacturer_combo.currentText()
+        prescription = self.ui.prescription_combo.currentText()
         p_min = self.ui.price_min.value()
         p_max = self.ui.price_max.value()
 
@@ -112,56 +148,47 @@ class MainWindow(QWidget):
         if text:
             result = [p for p in result
                       if text in p['name'].lower()
-                      or text in p['manufacturer'].lower()]
-        if category != 'Все типы':
-            result = [p for p in result if p['category'] == category]
-        if material != 'Все материалы':
-            result = [p for p in result if p['material'] == material]
-        if purpose != 'Все назначения':
-            result = [p for p in result if p['purpose'] == purpose]
+                      or text in p['active_ingredient'].lower()]
+        if disease != 'Все группы':
+            result = [p for p in result
+                      if p['disease_group'] == disease]
+        if form != 'Все формы':
+            result = [p for p in result
+                      if p['release_form'] == form]
+        if mfr != 'Все производители':
+            result = [p for p in result
+                      if mfr.lower() in p['manufacturer'].lower()]
+        if prescription != 'Все':
+            result = [p for p in result
+                      if p['prescription'] == prescription]
         if p_max > 0:
-            result = [p for p in result if p_min <= p['price'] <= p_max]
+            result = [p for p in result
+                      if p_min <= p['price'] <= p_max]
         self.fill_table(result)
 
     def reset(self):
         self.ui.search_edit.clear()
-        self.ui.category_combo.setCurrentIndex(0)
-        self.ui.material_combo.setCurrentIndex(0)
-        self.ui.purpose_combo.setCurrentIndex(0)
+        self.ui.disease_combo.setCurrentIndex(0)
+        self.ui.form_combo.setCurrentIndex(0)
+        self.ui.manufacturer_combo.setCurrentIndex(0)
+        self.ui.prescription_combo.setCurrentIndex(0)
         self.ui.price_min.setValue(0)
         self.ui.price_max.setValue(0)
         self.fill_table(self.products)
-
-    # ---------- Фото ----------
-    def show_photo(self, index):
-        photo_path = self.ui.table.item(index.row(), 5)
-        if photo_path and photo_path.text():
-            full = os.path.join(BASE_DIR, photo_path.text())
-            if os.path.exists(full):
-                dlg = QDialog(self)
-                dlg.setWindowTitle('Фото товара')
-                lbl = QLabel()
-                pix = QPixmap(full)
-                lbl.setPixmap(pix.scaled(400, 400))
-                lay = QVBoxLayout(dlg)
-                lay.addWidget(lbl)
-                dlg.exec()
 
     # ---------- Корзина (гостевая) ----------
     def add_to_cart(self):
         row = self.ui.table.currentRow()
         if row < 0:
-            QMessageBox.warning(self, 'Внимание', 'Выберите товар')
+            QMessageBox.warning(self, 'Внимание', 'Выберите препарат')
             return
-        name = self.ui.table.item(row, 0).text()
-        price = float(self.ui.table.item(row, 2).text())
-        # ищем product_id
+        name = self.ui.table.item(row, 1).text()
+        price = float(self.ui.table.item(row, 4).text())
         pid = None
         for p in self.products:
             if p['name'] == name and p['price'] == price:
                 pid = p['id']
                 break
-        # проверяем, есть ли уже в корзине
         for item in shared_cart:
             if item['product_id'] == pid:
                 item['quantity'] += 1
@@ -175,7 +202,8 @@ class MainWindow(QWidget):
             'price': price, 'quantity': 1
         })
         self.update_cart_btn()
-        QMessageBox.information(self, 'Корзина', f'{name} добавлен в корзину')
+        QMessageBox.information(
+            self, 'Корзина', f'{name} добавлен в корзину')
 
     def update_cart_btn(self):
         total_qty = sum(i['quantity'] for i in shared_cart)
@@ -240,7 +268,8 @@ class AuthWindow(QWidget):
         conn.close()
 
         if user is None:
-            QMessageBox.warning(self, 'Ошибка', 'Неверный e-mail или пароль')
+            QMessageBox.warning(
+                self, 'Ошибка', 'Неверный e-mail или пароль')
             return
 
         self.open_buyer(dict(user))
@@ -253,7 +282,8 @@ class AuthWindow(QWidget):
         pwd2 = self.ui.reg_password2_edit.text().strip()
 
         if not fio or not email or not pwd:
-            QMessageBox.warning(self, 'Ошибка', 'Заполните ФИО, e-mail и пароль')
+            QMessageBox.warning(
+                self, 'Ошибка', 'Заполните ФИО, e-mail и пароль')
             return
         if pwd != pwd2:
             QMessageBox.warning(self, 'Ошибка', 'Пароли не совпадают')
@@ -266,11 +296,13 @@ class AuthWindow(QWidget):
         if existing:
             conn.close()
             QMessageBox.warning(
-                self, 'Ошибка', 'Пользователь с таким e-mail уже существует')
+                self, 'Ошибка',
+                'Пользователь с таким e-mail уже существует')
             return
 
         conn.execute(
-            'INSERT INTO users (fio, email, phone, password) VALUES (?,?,?,?)',
+            'INSERT INTO users (fio, email, phone, password) '
+            'VALUES (?,?,?,?)',
             (fio, email, phone, pwd)
         )
         conn.commit()
@@ -280,7 +312,8 @@ class AuthWindow(QWidget):
         conn.close()
 
         QMessageBox.information(
-            self, 'Успех', 'Регистрация прошла успешно! Вы вошли в систему.')
+            self, 'Успех',
+            'Регистрация прошла успешно! Вы вошли в систему.')
         self.open_buyer(dict(user))
 
     def open_buyer(self, user_dict):
@@ -301,15 +334,13 @@ class BuyerWindow(QWidget):
         self.ui.setupUi(self)
         self.user = user  # dict: id, fio, email, phone, password
         self.products = load_products()
-        self.cart = shared_cart  # используем общую корзину
+        self.cart = shared_cart
 
         # --- Каталог ---
         self.fill_filters()
         self.fill_catalog(self.products)
         self.ui.search_btn.clicked.connect(self.search)
         self.ui.reset_btn.clicked.connect(self.reset_search)
-        self.ui.catalog_table.doubleClicked.connect(self.show_photo)
-        self.ui.catalog_table.setSortingEnabled(True)
         self.ui.add_to_cart_btn.clicked.connect(self.add_to_cart)
 
         # --- Корзина ---
@@ -329,41 +360,63 @@ class BuyerWindow(QWidget):
 
     # -------------------- Каталог --------------------
     def fill_filters(self):
-        cats = get_unique_values('category')
-        self.ui.category_combo.clear()
-        self.ui.category_combo.addItem('Все типы')
-        self.ui.category_combo.addItems(cats)
+        groups = get_unique_values('disease_group')
+        self.ui.disease_combo.clear()
+        self.ui.disease_combo.addItem('Все группы')
+        self.ui.disease_combo.addItems(groups)
 
-        mats = get_unique_values('material')
-        self.ui.material_combo.clear()
-        self.ui.material_combo.addItem('Все материалы')
-        self.ui.material_combo.addItems(mats)
+        forms = get_unique_values('release_form')
+        self.ui.form_combo.clear()
+        self.ui.form_combo.addItem('Все формы')
+        self.ui.form_combo.addItems(forms)
 
-        purposes = get_unique_values('purpose')
-        self.ui.purpose_combo.clear()
-        self.ui.purpose_combo.addItem('Все назначения')
-        self.ui.purpose_combo.addItems(purposes)
+        self.ui.manufacturer_combo.clear()
+        self.ui.manufacturer_combo.addItem('Все производители')
+        self.ui.manufacturer_combo.addItem('Отечественный')
+        self.ui.manufacturer_combo.addItem('Импортный')
+
+        self.ui.prescription_combo.clear()
+        self.ui.prescription_combo.addItem('Все')
+        self.ui.prescription_combo.addItem('Рецептурный')
+        self.ui.prescription_combo.addItem('Безрецептурный')
 
     def fill_catalog(self, data):
-        self.ui.catalog_table.setSortingEnabled(False)
         self.ui.catalog_table.setRowCount(len(data))
-        self.ui.catalog_table.setColumnCount(6)
+        self.ui.catalog_table.setColumnCount(7)
         self.ui.catalog_table.setHorizontalHeaderLabels(
-            ['Наименование', 'Материал', 'Цена', 'Производитель', 'Тип', 'Фото'])
+            ['Фото', 'Название', 'Инструкция', 'Форма выпуска',
+             'Цена', 'Группа', 'Рецепт'])
+        self.ui.catalog_table.setColumnWidth(0, 60)
+        self.ui.catalog_table.setColumnWidth(1, 150)
+        self.ui.catalog_table.setColumnWidth(2, 280)
+        self.ui.catalog_table.setColumnWidth(3, 120)
+        self.ui.catalog_table.setColumnWidth(4, 80)
+        self.ui.catalog_table.setColumnWidth(5, 160)
+        self.ui.catalog_table.setColumnWidth(6, 130)
+
         for i, p in enumerate(data):
-            self.ui.catalog_table.setItem(i, 0, QTableWidgetItem(p['name']))
-            self.ui.catalog_table.setItem(i, 1, QTableWidgetItem(p['material']))
-            self.ui.catalog_table.setItem(i, 2, QTableWidgetItem(str(p['price'])))
-            self.ui.catalog_table.setItem(i, 3, QTableWidgetItem(p['manufacturer']))
-            self.ui.catalog_table.setItem(i, 4, QTableWidgetItem(p['category']))
-            self.ui.catalog_table.setItem(i, 5, QTableWidgetItem(p['photo']))
-        self.ui.catalog_table.setSortingEnabled(True)
+            self.ui.catalog_table.setRowHeight(i, 58)
+            self.ui.catalog_table.setCellWidget(
+                i, 0, make_photo_label(p['photo']))
+            self.ui.catalog_table.setItem(
+                i, 1, QTableWidgetItem(p['name']))
+            self.ui.catalog_table.setItem(
+                i, 2, QTableWidgetItem(p['instruction']))
+            self.ui.catalog_table.setItem(
+                i, 3, QTableWidgetItem(p['release_form']))
+            self.ui.catalog_table.setItem(
+                i, 4, QTableWidgetItem(str(p['price'])))
+            self.ui.catalog_table.setItem(
+                i, 5, QTableWidgetItem(p['disease_group']))
+            self.ui.catalog_table.setItem(
+                i, 6, QTableWidgetItem(p['prescription']))
 
     def search(self):
         text = self.ui.search_edit.text().strip().lower()
-        category = self.ui.category_combo.currentText()
-        material = self.ui.material_combo.currentText()
-        purpose = self.ui.purpose_combo.currentText()
+        disease = self.ui.disease_combo.currentText()
+        form = self.ui.form_combo.currentText()
+        mfr = self.ui.manufacturer_combo.currentText()
+        prescription = self.ui.prescription_combo.currentText()
         p_min = self.ui.price_min.value()
         p_max = self.ui.price_max.value()
 
@@ -371,47 +424,41 @@ class BuyerWindow(QWidget):
         if text:
             result = [p for p in result
                       if text in p['name'].lower()
-                      or text in p['manufacturer'].lower()]
-        if category != 'Все типы':
-            result = [p for p in result if p['category'] == category]
-        if material != 'Все материалы':
-            result = [p for p in result if p['material'] == material]
-        if purpose != 'Все назначения':
-            result = [p for p in result if p['purpose'] == purpose]
+                      or text in p['active_ingredient'].lower()]
+        if disease != 'Все группы':
+            result = [p for p in result
+                      if p['disease_group'] == disease]
+        if form != 'Все формы':
+            result = [p for p in result
+                      if p['release_form'] == form]
+        if mfr != 'Все производители':
+            result = [p for p in result
+                      if mfr.lower() in p['manufacturer'].lower()]
+        if prescription != 'Все':
+            result = [p for p in result
+                      if p['prescription'] == prescription]
         if p_max > 0:
-            result = [p for p in result if p_min <= p['price'] <= p_max]
+            result = [p for p in result
+                      if p_min <= p['price'] <= p_max]
         self.fill_catalog(result)
 
     def reset_search(self):
         self.ui.search_edit.clear()
-        self.ui.category_combo.setCurrentIndex(0)
-        self.ui.material_combo.setCurrentIndex(0)
-        self.ui.purpose_combo.setCurrentIndex(0)
+        self.ui.disease_combo.setCurrentIndex(0)
+        self.ui.form_combo.setCurrentIndex(0)
+        self.ui.manufacturer_combo.setCurrentIndex(0)
+        self.ui.prescription_combo.setCurrentIndex(0)
         self.ui.price_min.setValue(0)
         self.ui.price_max.setValue(0)
         self.fill_catalog(self.products)
 
-    def show_photo(self, index):
-        photo_path = self.ui.catalog_table.item(index.row(), 5)
-        if photo_path and photo_path.text():
-            full = os.path.join(BASE_DIR, photo_path.text())
-            if os.path.exists(full):
-                dlg = QDialog(self)
-                dlg.setWindowTitle('Фото товара')
-                lbl = QLabel()
-                pix = QPixmap(full)
-                lbl.setPixmap(pix.scaled(400, 400))
-                lay = QVBoxLayout(dlg)
-                lay.addWidget(lbl)
-                dlg.exec()
-
     def add_to_cart(self):
         row = self.ui.catalog_table.currentRow()
         if row < 0:
-            QMessageBox.warning(self, 'Внимание', 'Выберите товар')
+            QMessageBox.warning(self, 'Внимание', 'Выберите препарат')
             return
-        name = self.ui.catalog_table.item(row, 0).text()
-        price = float(self.ui.catalog_table.item(row, 2).text())
+        name = self.ui.catalog_table.item(row, 1).text()
+        price = float(self.ui.catalog_table.item(row, 4).text())
         pid = None
         for p in self.products:
             if p['name'] == name and p['price'] == price:
@@ -430,7 +477,8 @@ class BuyerWindow(QWidget):
             'price': price, 'quantity': 1
         })
         self.refresh_cart()
-        QMessageBox.information(self, 'Корзина', f'{name} добавлен в корзину')
+        QMessageBox.information(
+            self, 'Корзина', f'{name} добавлен в корзину')
 
     # -------------------- Корзина --------------------
     def refresh_cart(self):
@@ -440,13 +488,15 @@ class BuyerWindow(QWidget):
             ['Наименование', 'Цена', 'Кол-во', 'Сумма'])
         total = 0
         for i, item in enumerate(self.cart):
-            self.ui.cart_table.setItem(i, 0, QTableWidgetItem(item['name']))
+            self.ui.cart_table.setItem(
+                i, 0, QTableWidgetItem(item['name']))
             self.ui.cart_table.setItem(
                 i, 1, QTableWidgetItem(f'{item["price"]} руб'))
             self.ui.cart_table.setItem(
                 i, 2, QTableWidgetItem(str(item['quantity'])))
             s = item['price'] * item['quantity']
-            self.ui.cart_table.setItem(i, 3, QTableWidgetItem(f'{s} руб'))
+            self.ui.cart_table.setItem(
+                i, 3, QTableWidgetItem(f'{s} руб'))
             total += s
         self.ui.cart_total_label.setText(f'Итого: {total} руб')
 
@@ -560,7 +610,8 @@ class BuyerWindow(QWidget):
                 # сохраняем новый адрес
                 conn = get_connection()
                 conn.execute(
-                    'INSERT INTO addresses (user_id, address) VALUES (?,?)',
+                    'INSERT INTO addresses (user_id, address) '
+                    'VALUES (?,?)',
                     (self.user['id'], address)
                 )
                 conn.commit()
