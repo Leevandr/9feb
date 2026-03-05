@@ -3,95 +3,268 @@
  <class>EmployeeForm</class>
  <widget class="QWidget" name="EmployeeForm">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>1050</width><height>600</height></rect>
+   <rect><x>0</x><y>0</y><width>1050</width><height>650</height></rect>
   </property>
   <property name="windowTitle">
    <string>Аренда инвентаря - Панель сотрудника</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="mainLayout">
    <property name="spacing"><number>0</number></property>
    <property name="leftMargin"><number>0</number></property>
    <property name="topMargin"><number>0</number></property>
    <property name="rightMargin"><number>0</number></property>
    <property name="bottomMargin"><number>0</number></property>
    <item>
-    <widget class="QWidget" name="top_panel">
-     <layout class="QHBoxLayout" name="top_layout">
-      <property name="leftMargin"><number>15</number></property>
-      <property name="topMargin"><number>10</number></property>
-      <property name="rightMargin"><number>15</number></property>
-      <property name="bottomMargin"><number>10</number></property>
+    <widget class="QWidget" name="sidebar">
+     <property name="minimumSize"><size><width>220</width><height>0</height></size></property>
+     <property name="maximumSize"><size><width>220</width><height>16777215</height></size></property>
+     <layout class="QVBoxLayout" name="sidebar_layout">
+      <property name="leftMargin"><number>12</number></property>
+      <property name="topMargin"><number>20</number></property>
+      <property name="rightMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>15</number></property>
       <item>
-       <widget class="QLabel" name="header_label">
-        <property name="text"><string>Заявки на аренду</string></property>
+       <widget class="QLabel" name="app_title">
+        <property name="text"><string>Аренда
+спортивного
+инвентаря</string></property>
         <property name="font">
-         <font><pointsize>14</pointsize><bold>true</bold></font>
+         <font><pointsize>13</pointsize><bold>true</bold></font>
         </property>
+        <property name="wordWrap"><bool>true</bool></property>
        </widget>
       </item>
       <item>
-       <spacer name="top_spacer">
-        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <spacer name="title_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
         <property name="sizeHint" stdset="0">
-         <size><width>40</width><height>20</height></size>
+         <size><width>20</width><height>20</height></size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QComboBox" name="status_filter_combo">
-        <property name="minimumSize"><size><width>160</width><height>34</height></size></property>
+       <widget class="QPushButton" name="nav_catalog_btn">
+        <property name="text"><string>Каталог</string></property>
+        <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="refresh_btn">
-        <property name="text"><string>Обновить</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+       <widget class="QPushButton" name="nav_requests_btn">
+        <property name="text"><string>Заявки</string></property>
+        <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="sidebar_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeHint" stdset="0">
+         <size><width>20</width><height>40</height></size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="back_btn">
+        <property name="text"><string>&lt; Назад</string></property>
+        <property name="minimumSize"><size><width>0</width><height>36</height></size></property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="requests_table">
-     <property name="alternatingRowColors"><bool>true</bool></property>
-     <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
-     <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="bottom_panel">
-     <layout class="QHBoxLayout" name="bottom_layout">
-      <property name="leftMargin"><number>15</number></property>
-      <property name="topMargin"><number>10</number></property>
-      <property name="rightMargin"><number>15</number></property>
-      <property name="bottomMargin"><number>10</number></property>
+    <widget class="QWidget" name="content_area">
+     <layout class="QVBoxLayout" name="content_layout">
+      <property name="spacing"><number>0</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
       <item>
-       <widget class="QLabel" name="status_label">
-        <property name="text"><string>Изменить статус:</string></property>
+       <widget class="QWidget" name="header_panel">
+        <layout class="QHBoxLayout" name="header_layout">
+         <property name="leftMargin"><number>15</number></property>
+         <property name="topMargin"><number>8</number></property>
+         <property name="rightMargin"><number>15</number></property>
+         <property name="bottomMargin"><number>8</number></property>
+         <item>
+          <widget class="QLabel" name="welcome_label">
+           <property name="text"><string>Добро пожаловать</string></property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="header_spacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0">
+            <size><width>40</width><height>20</height></size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="logout_btn">
+           <property name="text"><string>Выйти</string></property>
+           <property name="minimumSize"><size><width>0</width><height>30</height></size></property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="status_combo">
-        <property name="minimumSize"><size><width>180</width><height>34</height></size></property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="change_status_btn">
-        <property name="text"><string>Применить</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="bottom_spacer">
-        <property name="orientation"><enum>Qt::Horizontal</enum></property>
-        <property name="sizeHint" stdset="0">
-         <size><width>40</width><height>20</height></size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="employee_label">
-        <property name="text"><string/></property>
+       <widget class="QStackedWidget" name="pages">
+        <widget class="QWidget" name="catalog_page">
+         <layout class="QVBoxLayout" name="catalog_layout">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QWidget" name="filter_panel">
+            <layout class="QHBoxLayout" name="filter_layout">
+             <property name="leftMargin"><number>15</number></property>
+             <property name="topMargin"><number>8</number></property>
+             <property name="rightMargin"><number>15</number></property>
+             <property name="bottomMargin"><number>8</number></property>
+             <item>
+              <widget class="QLineEdit" name="search_edit">
+               <property name="placeholderText"><string>Поиск...</string></property>
+               <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="type_combo">
+               <property name="minimumSize"><size><width>130</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="point_combo">
+               <property name="minimumSize"><size><width>150</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="search_btn">
+               <property name="text"><string>Искать</string></property>
+               <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reset_btn">
+               <property name="text"><string>Сброс</string></property>
+               <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="catalog_header">
+            <property name="text"><string>Каталог оборудования</string></property>
+            <property name="font">
+             <font><pointsize>13</pointsize><bold>true</bold></font>
+            </property>
+            <property name="margin"><number>10</number></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QScrollArea" name="catalog_scroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="catalog_container">
+             <property name="geometry">
+              <rect><x>0</x><y>0</y><width>780</width><height>500</height></rect>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="requests_page">
+         <layout class="QVBoxLayout" name="requests_page_layout">
+          <property name="spacing"><number>8</number></property>
+          <property name="leftMargin"><number>15</number></property>
+          <property name="topMargin"><number>10</number></property>
+          <property name="rightMargin"><number>15</number></property>
+          <property name="bottomMargin"><number>10</number></property>
+          <item>
+           <widget class="QLabel" name="requests_header_label">
+            <property name="text"><string>Заявки на аренду</string></property>
+            <property name="font">
+             <font><pointsize>13</pointsize><bold>true</bold></font>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="requests_filter_panel">
+            <layout class="QHBoxLayout" name="requests_filter_layout">
+             <property name="leftMargin"><number>0</number></property>
+             <property name="topMargin"><number>0</number></property>
+             <property name="rightMargin"><number>0</number></property>
+             <property name="bottomMargin"><number>0</number></property>
+             <item>
+              <widget class="QComboBox" name="status_filter_combo">
+               <property name="minimumSize"><size><width>160</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="refresh_btn">
+               <property name="text"><string>Обновить</string></property>
+               <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="req_filter_spacer">
+               <property name="orientation"><enum>Qt::Horizontal</enum></property>
+               <property name="sizeHint" stdset="0">
+                <size><width>40</width><height>20</height></size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="requests_table">
+            <property name="alternatingRowColors"><bool>true</bool></property>
+            <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+            <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="status_change_panel">
+            <layout class="QHBoxLayout" name="status_change_layout">
+             <property name="leftMargin"><number>0</number></property>
+             <property name="topMargin"><number>0</number></property>
+             <property name="rightMargin"><number>0</number></property>
+             <property name="bottomMargin"><number>0</number></property>
+             <item>
+              <widget class="QLabel" name="status_label">
+               <property name="text"><string>Изменить статус:</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="status_combo">
+               <property name="minimumSize"><size><width>180</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="change_status_btn">
+               <property name="text"><string>Применить</string></property>
+               <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="status_spacer">
+               <property name="orientation"><enum>Qt::Horizontal</enum></property>
+               <property name="sizeHint" stdset="0">
+                <size><width>40</width><height>20</height></size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

@@ -4,8 +4,8 @@ import sqlite3
 from datetime import datetime, timedelta
 
 from PyQt6.QtWidgets import *
-from PyQt6.QtGui import QPixmap, QFont, QColor, QBrush, QIcon
-from PyQt6.QtCore import Qt, QSize, QDate
+from PyQt6.QtGui import QPixmap, QFont, QColor, QBrush
+from PyQt6.QtCore import Qt, QDate
 
 from gen.auth_ui import Ui_AuthForm
 from gen.main_ui import Ui_MainForm
@@ -16,91 +16,69 @@ from gen.admin_ui import Ui_AdminForm
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'rental.db')
 
+NAV_STYLE = (
+    'text-align:left;padding:10px 15px;border:none;border-radius:8px;'
+    'background:transparent;color:#2C3E50;font-size:13px;'
+)
+NAV_ACTIVE = (
+    'text-align:left;padding:10px 15px;border:none;border-radius:8px;'
+    'background:#DBEAFE;color:#2563EB;font-weight:bold;font-size:13px;'
+)
+
 APP_STYLE = """
-QWidget {
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-}
-#top_panel, #filter_panel {
-    background: #FFFFFF;
-    border-bottom: 1px solid #E8E8E8;
-}
-#bottom_panel {
-    background: #FFFFFF;
-    border-top: 1px solid #E8E8E8;
-}
+QWidget { font-family: 'Helvetica Neue','Helvetica','Arial',sans-serif; }
+#sidebar { background:#F5F6FA; border-right:1px solid #E0E0E0; }
+#header_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
+#filter_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
+#bottom_panel { background:#FFF; border-top:1px solid #E8E8E8; }
+#toolbar_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
 QLineEdit {
-    padding: 6px 10px;
-    border: 1px solid #D5D8DC;
-    border-radius: 8px;
-    background: white;
+    padding:6px 10px; border:1px solid #D5D8DC;
+    border-radius:8px; background:white;
 }
-QLineEdit:focus { border: 2px solid #3498DB; }
+QLineEdit:focus { border:2px solid #3498DB; }
 QComboBox {
-    padding: 6px 10px;
-    border: 1px solid #D5D8DC;
-    border-radius: 8px;
-    background: white;
+    padding:6px 10px; border:1px solid #D5D8DC;
+    border-radius:8px; background:white;
 }
 QPushButton {
-    padding: 6px 14px;
-    border: 1px solid #D5D8DC;
-    border-radius: 8px;
-    background: white;
-    color: #2C3E50;
+    padding:6px 14px; border:1px solid #D5D8DC;
+    border-radius:8px; background:white; color:#2C3E50;
 }
-QPushButton:hover { background: #F8F9FA; border-color: #BDC3C7; }
-#search_btn {
-    background: #3498DB; color: white;
-    border: none; font-weight: bold;
-}
-#search_btn:hover { background: #2E86C1; }
+QPushButton:hover { background:#F8F9FA; border-color:#BDC3C7; }
+#search_btn { background:#3498DB; color:white; border:none; font-weight:bold; }
+#search_btn:hover { background:#2E86C1; }
 #auth_btn {
-    background: #EBF5FB; color: #2E86C1;
-    border: 1px solid #AED6F1; font-weight: bold;
+    background:#EBF5FB; color:#2E86C1;
+    border:1px solid #AED6F1; font-weight:bold;
 }
-#auth_btn:hover { background: #D4E6F1; }
-#login_btn {
-    background: #3498DB; color: white;
-    border: none; font-weight: bold;
-}
-#login_btn:hover { background: #2E86C1; }
+#auth_btn:hover { background:#D4E6F1; }
+#login_btn { background:#3498DB; color:white; border:none; font-weight:bold; }
+#login_btn:hover { background:#2E86C1; }
 #guest_btn {
-    background: #E8F8F5; color: #1ABC9C;
-    border: 1px solid #A3E4D7; font-weight: bold;
+    background:#E8F8F5; color:#1ABC9C;
+    border:1px solid #A3E4D7; font-weight:bold;
 }
-#guest_btn:hover { background: #D1F2EB; }
-#checkout_btn {
-    background: #27AE60; color: white;
-    border: none; border-radius: 10px;
-    font-size: 14px; font-weight: bold;
+#guest_btn:hover { background:#D1F2EB; }
+#checkout_btn, #card_rent_btn {
+    background:#27AE60; color:white; border:none;
+    border-radius:8px; font-weight:bold;
 }
-#checkout_btn:hover { background: #2ECC71; }
-#delete_btn {
-    background: #E74C3C; color: white;
-    border: none; font-weight: bold;
-}
-#delete_btn:hover { background: #EC7063; }
-QTabWidget::pane { border: none; }
-QTabBar::tab { padding: 10px 20px; font-size: 13px; }
-QTabBar::tab:selected {
-    color: #2E86C1; font-weight: bold;
-    border-bottom: 2px solid #2E86C1;
-}
+#checkout_btn:hover, #card_rent_btn:hover { background:#2ECC71; }
+#card_rent_btn:disabled { background:#BDC3C7; color:#7F8C8D; }
+#delete_btn { background:#E74C3C; color:white; border:none; font-weight:bold; }
+#delete_btn:hover { background:#EC7063; }
 QTableWidget {
-    border: 1px solid #E8E8E8;
-    border-radius: 8px;
-    gridline-color: #F0F0F0;
-    alternate-background-color: #FAFBFC;
+    border:1px solid #E8E8E8; border-radius:8px;
+    gridline-color:#F0F0F0; alternate-background-color:#FAFBFC;
 }
-QTableWidget::item { padding: 6px; }
+QTableWidget::item { padding:6px; }
 QHeaderView::section {
-    background: #F8F9FA; border: none;
-    border-bottom: 1px solid #E8E8E8;
-    padding: 8px; font-weight: bold; color: #566573;
+    background:#F8F9FA; border:none;
+    border-bottom:1px solid #E8E8E8;
+    padding:8px; font-weight:bold; color:#566573;
 }
 """
-
-GRAY_BRUSH = QBrush(QColor(220, 220, 220))
 
 
 def get_connection():
@@ -148,41 +126,86 @@ def load_statuses():
     return [dict(r) for r in rows]
 
 
-def fill_equipment_table(table, data):
-    table.verticalHeader().setDefaultSectionSize(70)
-    table.setIconSize(QSize(60, 60))
-    table.setRowCount(len(data))
-    for i, eq in enumerate(data):
-        photo_path = os.path.join(BASE_DIR, eq['photo']) \
-            if eq['photo'] else ''
-        if photo_path and os.path.exists(photo_path):
-            pix = QPixmap(photo_path).scaled(
-                60, 60,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)
-            icon_item = QTableWidgetItem()
-            icon_item.setIcon(QIcon(pix))
-            table.setItem(i, 0, icon_item)
-        else:
-            table.setItem(i, 0, QTableWidgetItem(''))
+def set_active_nav(active_btn, all_btns):
+    for btn in all_btns:
+        btn.setStyleSheet(NAV_STYLE)
+    active_btn.setStyleSheet(NAV_ACTIVE)
 
-        table.setItem(i, 1, QTableWidgetItem(eq['name']))
-        table.setItem(i, 2, QTableWidgetItem(eq['type_name']))
-        table.setItem(i, 3, QTableWidgetItem(
-            f'{eq["rental_price_per_day"]:.0f} руб'))
-        table.setItem(i, 4, QTableWidgetItem(eq['point_name']))
 
-        avail_text = 'Доступно' if eq['available'] else 'Недоступно'
-        table.setItem(i, 5, QTableWidgetItem(avail_text))
+def create_card(eq, on_rent=None):
+    card = QFrame()
+    card.setObjectName('equip_card')
+    card.setFixedWidth(240)
+    if eq['available']:
+        card.setStyleSheet(
+            '#equip_card{background:white;border:1px solid #E0E0E0;'
+            'border-radius:10px;}')
+    else:
+        card.setStyleSheet(
+            '#equip_card{background:#F0F0F0;border:1px solid #D0D0D0;'
+            'border-radius:10px;}')
 
+    lay = QVBoxLayout(card)
+    lay.setSpacing(4)
+    lay.setContentsMargins(10, 10, 10, 10)
+
+    img_label = QLabel()
+    img_label.setFixedSize(220, 140)
+    img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    img_label.setStyleSheet('background:#F8F9FA;border-radius:6px;')
+    photo_path = os.path.join(BASE_DIR, eq['photo']) if eq['photo'] else ''
+    if photo_path and os.path.exists(photo_path):
+        pix = QPixmap(photo_path).scaled(
+            220, 140,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+        img_label.setPixmap(pix)
+    lay.addWidget(img_label)
+
+    name_label = QLabel(eq['name'])
+    name_label.setFont(QFont('', 11, QFont.Weight.Bold))
+    name_label.setWordWrap(True)
+    lay.addWidget(name_label)
+
+    price_label = QLabel(f'{eq["rental_price_per_day"]:.0f} ₽/сутки')
+    price_label.setStyleSheet('color:#2C3E50;font-size:12px;')
+    lay.addWidget(price_label)
+
+    point_label = QLabel(f'▶ {eq["point_name"]}')
+    point_label.setStyleSheet('color:#566573;font-size:11px;')
+    lay.addWidget(point_label)
+
+    if eq['available']:
+        avail_label = QLabel('В наличии')
+        avail_label.setStyleSheet('color:#27AE60;font-size:11px;')
+    else:
+        avail_label = QLabel('Нет в наличии')
+        avail_label.setStyleSheet('color:#E74C3C;font-size:11px;')
+    lay.addWidget(avail_label)
+
+    if on_rent is not None:
+        rent_btn = QPushButton('Оформить аренду')
+        rent_btn.setObjectName('card_rent_btn')
+        rent_btn.setMinimumHeight(32)
         if not eq['available']:
-            for col in range(table.columnCount()):
-                item = table.item(i, col)
-                if item:
-                    item.setBackground(GRAY_BRUSH)
+            rent_btn.setEnabled(False)
+        rent_btn.clicked.connect(lambda checked, e=eq: on_rent(e))
+        lay.addWidget(rent_btn)
 
-    table.resizeColumnsToContents()
-    table.horizontalHeader().setStretchLastSection(True)
+    return card
+
+
+def fill_catalog(scroll_area, data, on_rent=None):
+    container = QWidget()
+    grid = QGridLayout(container)
+    grid.setSpacing(15)
+    grid.setContentsMargins(15, 5, 15, 15)
+    cols = 3
+    for i, eq in enumerate(data):
+        card = create_card(eq, on_rent)
+        grid.addWidget(card, i // cols, i % cols)
+    grid.setRowStretch(len(data) // cols + 1, 1)
+    scroll_area.setWidget(container)
 
 
 class AuthWindow(QWidget):
@@ -190,7 +213,6 @@ class AuthWindow(QWidget):
         super().__init__()
         self.ui = Ui_AuthForm()
         self.ui.setupUi(self)
-
         self.ui.login_btn.clicked.connect(self.do_login)
         self.ui.guest_btn.clicked.connect(self.open_guest)
         self.ui.register_btn.clicked.connect(self.do_register)
@@ -201,9 +223,7 @@ class AuthWindow(QWidget):
         if not login or not password:
             QMessageBox.warning(self, 'Ошибка', 'Заполните все поля')
             return
-
         conn = get_connection()
-
         emp = conn.execute(
             'SELECT * FROM employees WHERE login = ? AND password = ?',
             (login, password)).fetchone()
@@ -215,18 +235,14 @@ class AuthWindow(QWidget):
             else:
                 self.open_employee(emp_dict)
             return
-
         client = conn.execute(
             'SELECT * FROM clients WHERE email = ? AND password = ?',
             (login, password)).fetchone()
         conn.close()
-
         if client:
             self.open_client(dict(client))
             return
-
-        QMessageBox.warning(
-            self, 'Ошибка', 'Неверный логин или пароль')
+        QMessageBox.warning(self, 'Ошибка', 'Неверный логин или пароль')
 
     def do_register(self):
         fio = self.ui.reg_fio_edit.text().strip()
@@ -234,7 +250,6 @@ class AuthWindow(QWidget):
         phone = self.ui.reg_phone_edit.text().strip()
         pwd = self.ui.reg_password_edit.text().strip()
         pwd2 = self.ui.reg_password2_edit.text().strip()
-
         if not fio or not email or not pwd:
             QMessageBox.warning(
                 self, 'Ошибка', 'Заполните ФИО, e-mail и пароль')
@@ -242,7 +257,6 @@ class AuthWindow(QWidget):
         if pwd != pwd2:
             QMessageBox.warning(self, 'Ошибка', 'Пароли не совпадают')
             return
-
         conn = get_connection()
         existing = conn.execute(
             'SELECT id FROM clients WHERE email = ?', (email,)
@@ -253,7 +267,6 @@ class AuthWindow(QWidget):
                 self, 'Ошибка',
                 'Клиент с таким e-mail уже существует')
             return
-
         conn.execute(
             'INSERT INTO clients (fio, email, phone, password) '
             'VALUES (?,?,?,?)',
@@ -263,7 +276,6 @@ class AuthWindow(QWidget):
             'SELECT * FROM clients WHERE email = ?', (email,)
         ).fetchone()
         conn.close()
-
         QMessageBox.information(
             self, 'Успех', 'Регистрация прошла успешно!')
         self.open_client(dict(client))
@@ -274,19 +286,19 @@ class AuthWindow(QWidget):
         self.hide()
 
     def open_client(self, client_dict):
-        self.client_win = ClientWindow(client_dict)
+        self.client_win = ClientWindow(client_dict, auth_window=self)
         self.client_win.show()
-        self.close()
+        self.hide()
 
     def open_employee(self, emp_dict):
-        self.emp_win = EmployeeWindow(emp_dict)
+        self.emp_win = EmployeeWindow(emp_dict, auth_window=self)
         self.emp_win.show()
-        self.close()
+        self.hide()
 
     def open_admin(self, emp_dict):
-        self.admin_win = AdminWindow(emp_dict)
+        self.admin_win = AdminWindow(emp_dict, auth_window=self)
         self.admin_win.show()
-        self.close()
+        self.hide()
 
 
 class MainWindow(QWidget):
@@ -295,10 +307,11 @@ class MainWindow(QWidget):
         self.ui = Ui_MainForm()
         self.ui.setupUi(self)
         self.auth_window = auth_window
-
         self.equipment = load_equipment()
+
+        set_active_nav(self.ui.nav_catalog_btn, [self.ui.nav_catalog_btn])
         self.fill_filters()
-        self.refresh_table(self.equipment)
+        self.refresh_catalog(self.equipment)
 
         self.ui.search_btn.clicked.connect(self.search)
         self.ui.reset_btn.clicked.connect(self.reset)
@@ -308,38 +321,33 @@ class MainWindow(QWidget):
         self.ui.type_combo.clear()
         self.ui.type_combo.addItem('Все типы')
         self.ui.type_combo.addItems(load_types())
-
         self.ui.point_combo.clear()
         self.ui.point_combo.addItem('Все пункты')
         for p in load_points():
             self.ui.point_combo.addItem(p['name'])
 
-    def refresh_table(self, data):
-        fill_equipment_table(self.ui.table, data)
+    def refresh_catalog(self, data):
+        fill_catalog(self.ui.catalog_scroll, data)
         self.ui.count_label.setText(f'Оборудования: {len(data)}')
 
     def search(self):
         text = self.ui.search_edit.text().strip().lower()
         eq_type = self.ui.type_combo.currentText()
         point = self.ui.point_combo.currentText()
-
         result = self.equipment
         if text:
-            result = [e for e in result
-                      if text in e['name'].lower()]
+            result = [e for e in result if text in e['name'].lower()]
         if eq_type != 'Все типы':
-            result = [e for e in result
-                      if e['type_name'] == eq_type]
+            result = [e for e in result if e['type_name'] == eq_type]
         if point != 'Все пункты':
-            result = [e for e in result
-                      if e['point_name'] == point]
-        self.refresh_table(result)
+            result = [e for e in result if e['point_name'] == point]
+        self.refresh_catalog(result)
 
     def reset(self):
         self.ui.search_edit.clear()
         self.ui.type_combo.setCurrentIndex(0)
         self.ui.point_combo.setCurrentIndex(0)
-        self.refresh_table(self.equipment)
+        self.refresh_catalog(self.equipment)
 
     def open_auth(self):
         if self.auth_window:
@@ -348,80 +356,84 @@ class MainWindow(QWidget):
 
 
 class ClientWindow(QWidget):
-    def __init__(self, user):
+    def __init__(self, user, auth_window=None):
         super().__init__()
         self.ui = Ui_ClientForm()
         self.ui.setupUi(self)
         self.user = user
+        self.auth_window = auth_window
         self.equipment = load_equipment()
 
+        self.nav_btns = [
+            self.ui.nav_catalog_btn,
+            self.ui.nav_requests_btn,
+            self.ui.nav_profile_btn,
+        ]
+
+        self.ui.welcome_label.setText(
+            f'Добро пожаловать, {self.user["fio"]}')
+
         self.fill_filters()
-        self.refresh_equip(self.equipment)
+        self.show_catalog()
+
+        self.ui.nav_catalog_btn.clicked.connect(self.show_catalog)
+        self.ui.nav_requests_btn.clicked.connect(self.show_requests)
+        self.ui.nav_profile_btn.clicked.connect(self.show_profile)
         self.ui.search_btn.clicked.connect(self.search)
         self.ui.reset_btn.clicked.connect(self.reset_search)
-        self.ui.rent_btn.clicked.connect(self.create_request)
-
-        self.refresh_requests()
-
-        self.ui.profile_fio.setText(f'ФИО: {self.user["fio"]}')
-        self.ui.profile_email.setText(
-            f'E-mail: {self.user["email"]}')
-        self.ui.profile_phone.setText(
-            f'Телефон: {self.user["phone"]}')
+        self.ui.back_btn.clicked.connect(self.go_back)
+        self.ui.logout_btn.clicked.connect(self.go_back)
 
     def fill_filters(self):
         self.ui.type_combo.clear()
         self.ui.type_combo.addItem('Все типы')
         self.ui.type_combo.addItems(load_types())
-
         self.ui.point_combo.clear()
         self.ui.point_combo.addItem('Все пункты')
         for p in load_points():
             self.ui.point_combo.addItem(p['name'])
 
-    def refresh_equip(self, data):
-        fill_equipment_table(self.ui.equip_table, data)
+    def show_catalog(self):
+        self.ui.pages.setCurrentIndex(0)
+        set_active_nav(self.ui.nav_catalog_btn, self.nav_btns)
+        self.refresh_catalog(self.equipment)
+
+    def show_requests(self):
+        self.ui.pages.setCurrentIndex(1)
+        set_active_nav(self.ui.nav_requests_btn, self.nav_btns)
+        self.refresh_requests()
+
+    def show_profile(self):
+        self.ui.pages.setCurrentIndex(2)
+        set_active_nav(self.ui.nav_profile_btn, self.nav_btns)
+        self.ui.profile_fio.setText(f'ФИО: {self.user["fio"]}')
+        self.ui.profile_email.setText(f'E-mail: {self.user["email"]}')
+        self.ui.profile_phone.setText(f'Телефон: {self.user["phone"]}')
+
+    def refresh_catalog(self, data):
+        fill_catalog(self.ui.catalog_scroll, data,
+                     on_rent=self.create_request)
 
     def search(self):
         text = self.ui.search_edit.text().strip().lower()
         eq_type = self.ui.type_combo.currentText()
         point = self.ui.point_combo.currentText()
-
         result = self.equipment
         if text:
-            result = [e for e in result
-                      if text in e['name'].lower()]
+            result = [e for e in result if text in e['name'].lower()]
         if eq_type != 'Все типы':
-            result = [e for e in result
-                      if e['type_name'] == eq_type]
+            result = [e for e in result if e['type_name'] == eq_type]
         if point != 'Все пункты':
-            result = [e for e in result
-                      if e['point_name'] == point]
-        self.refresh_equip(result)
+            result = [e for e in result if e['point_name'] == point]
+        self.refresh_catalog(result)
 
     def reset_search(self):
         self.ui.search_edit.clear()
         self.ui.type_combo.setCurrentIndex(0)
         self.ui.point_combo.setCurrentIndex(0)
-        self.refresh_equip(self.equipment)
+        self.refresh_catalog(self.equipment)
 
-    def create_request(self):
-        row = self.ui.equip_table.currentRow()
-        if row < 0:
-            QMessageBox.warning(
-                self, 'Внимание',
-                'Выберите оборудование из таблицы')
-            return
-
-        name_item = self.ui.equip_table.item(row, 1)
-        if not name_item:
-            return
-        eq_name = name_item.text()
-        eq = next((e for e in self.equipment
-                    if e['name'] == eq_name), None)
-        if not eq:
-            return
-
+    def create_request(self, eq):
         if not eq['available']:
             QMessageBox.warning(
                 self, 'Внимание',
@@ -433,12 +445,9 @@ class ClientWindow(QWidget):
         dlg.resize(400, 300)
         layout = QVBoxLayout(dlg)
 
-        layout.addWidget(QLabel(
-            f'Оборудование: {eq["name"]}'))
-        layout.addWidget(QLabel(
-            f'Тип: {eq["type_name"]}'))
-        layout.addWidget(QLabel(
-            f'Пункт выдачи: {eq["point_name"]}'))
+        layout.addWidget(QLabel(f'Оборудование: {eq["name"]}'))
+        layout.addWidget(QLabel(f'Тип: {eq["type_name"]}'))
+        layout.addWidget(QLabel(f'Пункт выдачи: {eq["point_name"]}'))
         layout.addWidget(QLabel(
             f'Стоимость: {eq["rental_price_per_day"]:.0f} руб/сутки'))
 
@@ -460,7 +469,7 @@ class ClientWindow(QWidget):
 
         total_label = QLabel('')
         total_label.setStyleSheet(
-            'font-weight: bold; font-size: 14px; color: #27AE60;')
+            'font-weight:bold;font-size:14px;color:#27AE60;')
         layout.addWidget(total_label)
 
         def calc_total():
@@ -468,8 +477,7 @@ class ClientWindow(QWidget):
             if days < 1:
                 days = 1
             cost = days * eq['rental_price_per_day']
-            total_label.setText(
-                f'Итого: {cost:.0f} руб ({days} сут.)')
+            total_label.setText(f'Итого: {cost:.0f} руб ({days} сут.)')
 
         start_date.dateChanged.connect(calc_total)
         end_date.dateChanged.connect(calc_total)
@@ -496,14 +504,13 @@ class ClientWindow(QWidget):
             status = conn.execute(
                 "SELECT id FROM rental_statuses WHERE name = 'Новая'"
             ).fetchone()
-            status_id = status['id']
 
             conn.execute('''
                 INSERT INTO rental_requests
                     (client_id, equipment_id, status_id,
                      start_date, end_date, total_cost, created_at)
                 VALUES (?,?,?,?,?,?,?)
-            ''', (self.user['id'], eq['id'], status_id,
+            ''', (self.user['id'], eq['id'], status['id'],
                   s_date, e_date, cost, created))
             conn.commit()
             conn.close()
@@ -554,34 +561,92 @@ class ClientWindow(QWidget):
             tbl.setItem(i, 6, QTableWidgetItem(r['created_at']))
 
         tbl.resizeColumnsToContents()
-        self.ui.profile_requests_count.setText(
-            f'Заявок: {len(rows)}')
+        self.ui.profile_requests_count.setText(f'Заявок: {len(rows)}')
+
+    def go_back(self):
+        if self.auth_window:
+            self.auth_window.show()
+        self.close()
 
 
 class EmployeeWindow(QWidget):
-    def __init__(self, employee):
+    def __init__(self, employee, auth_window=None):
         super().__init__()
         self.ui = Ui_EmployeeForm()
         self.ui.setupUi(self)
         self.employee = employee
+        self.auth_window = auth_window
+        self.equipment = load_equipment()
 
-        self.ui.employee_label.setText(
-            f'Сотрудник: {self.employee["fio"]}')
+        self.nav_btns = [
+            self.ui.nav_catalog_btn,
+            self.ui.nav_requests_btn,
+        ]
+
+        self.ui.welcome_label.setText(
+            f'Добро пожаловать, {self.employee["fio"]}')
 
         self.statuses = load_statuses()
         self.ui.status_filter_combo.addItem('Все статусы')
         for s in self.statuses:
             self.ui.status_filter_combo.addItem(s['name'])
-
         for s in self.statuses:
             self.ui.status_combo.addItem(s['name'])
 
-        self.refresh_requests()
+        self.fill_filters()
+        self.show_requests()
 
+        self.ui.nav_catalog_btn.clicked.connect(self.show_catalog)
+        self.ui.nav_requests_btn.clicked.connect(self.show_requests)
         self.ui.refresh_btn.clicked.connect(self.refresh_requests)
         self.ui.status_filter_combo.currentIndexChanged.connect(
             self.refresh_requests)
         self.ui.change_status_btn.clicked.connect(self.change_status)
+        self.ui.search_btn.clicked.connect(self.search_catalog)
+        self.ui.reset_btn.clicked.connect(self.reset_catalog)
+        self.ui.back_btn.clicked.connect(self.go_back)
+        self.ui.logout_btn.clicked.connect(self.go_back)
+
+    def fill_filters(self):
+        self.ui.type_combo.clear()
+        self.ui.type_combo.addItem('Все типы')
+        self.ui.type_combo.addItems(load_types())
+        self.ui.point_combo.clear()
+        self.ui.point_combo.addItem('Все пункты')
+        for p in load_points():
+            self.ui.point_combo.addItem(p['name'])
+
+    def show_catalog(self):
+        self.ui.pages.setCurrentIndex(0)
+        set_active_nav(self.ui.nav_catalog_btn, self.nav_btns)
+        self.refresh_catalog(self.equipment)
+
+    def show_requests(self):
+        self.ui.pages.setCurrentIndex(1)
+        set_active_nav(self.ui.nav_requests_btn, self.nav_btns)
+        self.refresh_requests()
+
+    def refresh_catalog(self, data):
+        fill_catalog(self.ui.catalog_scroll, data)
+
+    def search_catalog(self):
+        text = self.ui.search_edit.text().strip().lower()
+        eq_type = self.ui.type_combo.currentText()
+        point = self.ui.point_combo.currentText()
+        result = self.equipment
+        if text:
+            result = [e for e in result if text in e['name'].lower()]
+        if eq_type != 'Все типы':
+            result = [e for e in result if e['type_name'] == eq_type]
+        if point != 'Все пункты':
+            result = [e for e in result if e['point_name'] == point]
+        self.refresh_catalog(result)
+
+    def reset_catalog(self):
+        self.ui.search_edit.clear()
+        self.ui.type_combo.setCurrentIndex(0)
+        self.ui.point_combo.setCurrentIndex(0)
+        self.refresh_catalog(self.equipment)
 
     def refresh_requests(self):
         conn = get_connection()
@@ -638,8 +703,7 @@ class EmployeeWindow(QWidget):
             tbl.setItem(i, 6, QTableWidgetItem(
                 f'{r["total_cost"]:.0f} руб'))
             tbl.setItem(i, 7, QTableWidgetItem(r['created_at']))
-            tbl.setItem(i, 8, QTableWidgetItem(
-                r['emp_fio'] or ''))
+            tbl.setItem(i, 8, QTableWidgetItem(r['emp_fio'] or ''))
 
         tbl.resizeColumnsToContents()
 
@@ -684,18 +748,31 @@ class EmployeeWindow(QWidget):
         conn.commit()
         conn.close()
 
+        self.equipment = load_equipment()
         self.refresh_requests()
         QMessageBox.information(
             self, 'Статус обновлен',
             f'Заявка #{request_id}: {new_status_name}')
 
+    def go_back(self):
+        if self.auth_window:
+            self.auth_window.show()
+        self.close()
+
 
 class AdminWindow(QWidget):
-    def __init__(self, employee):
+    def __init__(self, employee, auth_window=None):
         super().__init__()
         self.ui = Ui_AdminForm()
         self.ui.setupUi(self)
         self.employee = employee
+        self.auth_window = auth_window
+
+        set_active_nav(
+            self.ui.nav_equipment_btn, [self.ui.nav_equipment_btn])
+
+        self.ui.welcome_label.setText(
+            f'Добро пожаловать, {self.employee["fio"]}')
 
         self.refresh_table()
 
@@ -703,6 +780,8 @@ class AdminWindow(QWidget):
         self.ui.edit_btn.clicked.connect(self.edit_equipment)
         self.ui.delete_btn.clicked.connect(self.delete_equipment)
         self.ui.refresh_btn.clicked.connect(self.refresh_table)
+        self.ui.back_btn.clicked.connect(self.go_back)
+        self.ui.logout_btn.clicked.connect(self.go_back)
 
     def refresh_table(self):
         self.equipment = load_equipment()
@@ -721,10 +800,11 @@ class AdminWindow(QWidget):
             tbl.setItem(i, 6, QTableWidgetItem(eq['photo']))
 
             if not eq['available']:
+                gray = QBrush(QColor(220, 220, 220))
                 for col in range(tbl.columnCount()):
                     item = tbl.item(i, col)
                     if item:
-                        item.setBackground(GRAY_BRUSH)
+                        item.setBackground(gray)
 
         tbl.resizeColumnsToContents()
         self.ui.count_label.setText(
@@ -878,6 +958,11 @@ class AdminWindow(QWidget):
         self.refresh_table()
         QMessageBox.information(
             self, 'Удалено', f'{eq["name"]} удалено')
+
+    def go_back(self):
+        if self.auth_window:
+            self.auth_window.show()
+        self.close()
 
 
 if __name__ == '__main__':

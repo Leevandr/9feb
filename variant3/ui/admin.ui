@@ -8,86 +8,178 @@
   <property name="windowTitle">
    <string>Аренда инвентаря - Панель администратора</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="mainLayout">
    <property name="spacing"><number>0</number></property>
    <property name="leftMargin"><number>0</number></property>
    <property name="topMargin"><number>0</number></property>
    <property name="rightMargin"><number>0</number></property>
    <property name="bottomMargin"><number>0</number></property>
    <item>
-    <widget class="QWidget" name="top_panel">
-     <layout class="QHBoxLayout" name="top_layout">
-      <property name="leftMargin"><number>15</number></property>
-      <property name="topMargin"><number>10</number></property>
-      <property name="rightMargin"><number>15</number></property>
-      <property name="bottomMargin"><number>10</number></property>
+    <widget class="QWidget" name="sidebar">
+     <property name="minimumSize"><size><width>220</width><height>0</height></size></property>
+     <property name="maximumSize"><size><width>220</width><height>16777215</height></size></property>
+     <layout class="QVBoxLayout" name="sidebar_layout">
+      <property name="leftMargin"><number>12</number></property>
+      <property name="topMargin"><number>20</number></property>
+      <property name="rightMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>15</number></property>
       <item>
-       <widget class="QLabel" name="header_label">
-        <property name="text"><string>Управление оборудованием</string></property>
+       <widget class="QLabel" name="app_title">
+        <property name="text"><string>Аренда
+спортивного
+инвентаря</string></property>
         <property name="font">
-         <font><pointsize>14</pointsize><bold>true</bold></font>
+         <font><pointsize>13</pointsize><bold>true</bold></font>
         </property>
+        <property name="wordWrap"><bool>true</bool></property>
        </widget>
       </item>
       <item>
-       <spacer name="top_spacer">
-        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <spacer name="title_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
         <property name="sizeHint" stdset="0">
-         <size><width>40</width><height>20</height></size>
+         <size><width>20</width><height>20</height></size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="add_btn">
-        <property name="text"><string>Добавить</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+       <widget class="QPushButton" name="nav_equipment_btn">
+        <property name="text"><string>Оборудование</string></property>
+        <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="edit_btn">
-        <property name="text"><string>Редактировать</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
-       </widget>
+       <spacer name="sidebar_spacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeHint" stdset="0">
+         <size><width>20</width><height>40</height></size>
+        </property>
+       </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="delete_btn">
-        <property name="text"><string>Удалить</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="refresh_btn">
-        <property name="text"><string>Обновить</string></property>
-        <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+       <widget class="QPushButton" name="back_btn">
+        <property name="text"><string>&lt; Назад</string></property>
+        <property name="minimumSize"><size><width>0</width><height>36</height></size></property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="table">
-     <property name="alternatingRowColors"><bool>true</bool></property>
-     <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
-     <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
-     <column><property name="text"><string>ID</string></property></column>
-     <column><property name="text"><string>Наименование</string></property></column>
-     <column><property name="text"><string>Тип</string></property></column>
-     <column><property name="text"><string>Стоимость/сутки</string></property></column>
-     <column><property name="text"><string>Пункт выдачи</string></property></column>
-     <column><property name="text"><string>Доступность</string></property></column>
-     <column><property name="text"><string>Фото</string></property></column>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="bottom_panel">
-     <layout class="QHBoxLayout" name="bottom_layout">
-      <property name="leftMargin"><number>15</number></property>
-      <property name="topMargin"><number>6</number></property>
-      <property name="rightMargin"><number>15</number></property>
-      <property name="bottomMargin"><number>6</number></property>
+    <widget class="QWidget" name="content_area">
+     <layout class="QVBoxLayout" name="content_layout">
+      <property name="spacing"><number>0</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
       <item>
-       <widget class="QLabel" name="count_label">
-        <property name="text"><string>Оборудования: 0</string></property>
+       <widget class="QWidget" name="header_panel">
+        <layout class="QHBoxLayout" name="header_layout">
+         <property name="leftMargin"><number>15</number></property>
+         <property name="topMargin"><number>8</number></property>
+         <property name="rightMargin"><number>15</number></property>
+         <property name="bottomMargin"><number>8</number></property>
+         <item>
+          <widget class="QLabel" name="welcome_label">
+           <property name="text"><string>Добро пожаловать</string></property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="header_spacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0">
+            <size><width>40</width><height>20</height></size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="logout_btn">
+           <property name="text"><string>Выйти</string></property>
+           <property name="minimumSize"><size><width>0</width><height>30</height></size></property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="toolbar_panel">
+        <layout class="QHBoxLayout" name="toolbar_layout">
+         <property name="leftMargin"><number>15</number></property>
+         <property name="topMargin"><number>8</number></property>
+         <property name="rightMargin"><number>15</number></property>
+         <property name="bottomMargin"><number>8</number></property>
+         <item>
+          <widget class="QLabel" name="manage_header">
+           <property name="text"><string>Управление оборудованием</string></property>
+           <property name="font">
+            <font><pointsize>13</pointsize><bold>true</bold></font>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="toolbar_spacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0">
+            <size><width>40</width><height>20</height></size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="add_btn">
+           <property name="text"><string>Добавить</string></property>
+           <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="edit_btn">
+           <property name="text"><string>Редактировать</string></property>
+           <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="delete_btn">
+           <property name="text"><string>Удалить</string></property>
+           <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="refresh_btn">
+           <property name="text"><string>Обновить</string></property>
+           <property name="minimumSize"><size><width>0</width><height>34</height></size></property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="table">
+        <property name="alternatingRowColors"><bool>true</bool></property>
+        <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+        <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+        <column><property name="text"><string>ID</string></property></column>
+        <column><property name="text"><string>Наименование</string></property></column>
+        <column><property name="text"><string>Тип</string></property></column>
+        <column><property name="text"><string>Стоимость/сутки</string></property></column>
+        <column><property name="text"><string>Пункт выдачи</string></property></column>
+        <column><property name="text"><string>Доступность</string></property></column>
+        <column><property name="text"><string>Фото</string></property></column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="bottom_panel">
+        <layout class="QHBoxLayout" name="bottom_layout">
+         <property name="leftMargin"><number>15</number></property>
+         <property name="topMargin"><number>6</number></property>
+         <property name="rightMargin"><number>15</number></property>
+         <property name="bottomMargin"><number>6</number></property>
+         <item>
+          <widget class="QLabel" name="count_label">
+           <property name="text"><string>Оборудования: 0</string></property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
