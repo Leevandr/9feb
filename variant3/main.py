@@ -17,66 +17,67 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'rental.db')
 
 NAV_STYLE = (
-    'text-align:left;padding:10px 15px;border:none;border-radius:8px;'
-    'background:transparent;color:#2C3E50;font-size:13px;'
+    'text-align:left;padding:10px 14px;border:none;border-radius:4px;'
+    'background:transparent;color:#CCCCCC;font-size:13px;'
 )
 NAV_ACTIVE = (
-    'text-align:left;padding:10px 15px;border:none;border-radius:8px;'
-    'background:#DBEAFE;color:#2563EB;font-weight:bold;font-size:13px;'
+    'text-align:left;padding:10px 14px;border:none;border-radius:4px;'
+    'background:#3D3D3D;color:#F5A623;font-weight:bold;font-size:13px;'
 )
 
 APP_STYLE = """
-QWidget { font-family: 'Helvetica Neue','Helvetica','Arial',sans-serif; }
-#sidebar { background:#F5F6FA; border-right:1px solid #E0E0E0; }
-#header_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
-#filter_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
-#bottom_panel { background:#FFF; border-top:1px solid #E8E8E8; }
-#toolbar_panel { background:#FFF; border-bottom:1px solid #E8E8E8; }
+QWidget { font-family: 'Segoe UI','Roboto','Arial',sans-serif; font-size:13px; }
+#sidebar { background:#2C2C2C; border-right:none; }
+#sidebar QLabel { color:#EEEEEE; }
+#header_panel { background:#FAFAFA; border-bottom:1px solid #DDD; }
+#filter_panel { background:#FAFAFA; border-bottom:1px solid #DDD; }
+#bottom_panel { background:#FAFAFA; border-top:1px solid #DDD; }
+#toolbar_panel { background:#FAFAFA; border-bottom:1px solid #DDD; }
 QLineEdit {
-    padding:6px 10px; border:1px solid #D5D8DC;
-    border-radius:8px; background:white;
+    padding:5px 10px; border:1px solid #CCC;
+    border-radius:4px; background:white;
 }
-QLineEdit:focus { border:2px solid #3498DB; }
+QLineEdit:focus { border:1px solid #E67E22; }
 QComboBox {
-    padding:6px 10px; border:1px solid #D5D8DC;
-    border-radius:8px; background:white;
+    padding:5px 10px; border:1px solid #CCC;
+    border-radius:4px; background:white;
 }
 QPushButton {
-    padding:6px 14px; border:1px solid #D5D8DC;
-    border-radius:8px; background:white; color:#2C3E50;
+    padding:5px 12px; border:1px solid #CCC;
+    border-radius:4px; background:#FAFAFA; color:#333;
 }
-QPushButton:hover { background:#F8F9FA; border-color:#BDC3C7; }
-#search_btn { background:#3498DB; color:white; border:none; font-weight:bold; }
-#search_btn:hover { background:#2E86C1; }
+QPushButton:hover { background:#F0F0F0; border-color:#AAA; }
+#search_btn { background:#E67E22; color:white; border:none; }
+#search_btn:hover { background:#D35400; }
 #auth_btn {
-    background:#EBF5FB; color:#2E86C1;
-    border:1px solid #AED6F1; font-weight:bold;
+    background:#FFF3E0; color:#E65100;
+    border:1px solid #FFCC80;
 }
-#auth_btn:hover { background:#D4E6F1; }
-#login_btn { background:#3498DB; color:white; border:none; font-weight:bold; }
-#login_btn:hover { background:#2E86C1; }
+#auth_btn:hover { background:#FFE0B2; }
+#login_btn { background:#E67E22; color:white; border:none; }
+#login_btn:hover { background:#D35400; }
 #guest_btn {
-    background:#E8F8F5; color:#1ABC9C;
-    border:1px solid #A3E4D7; font-weight:bold;
+    background:#F5F5F5; color:#555;
+    border:1px solid #CCC;
 }
-#guest_btn:hover { background:#D1F2EB; }
+#guest_btn:hover { background:#EEEEEE; }
 #checkout_btn, #card_rent_btn {
-    background:#27AE60; color:white; border:none;
-    border-radius:8px; font-weight:bold;
+    background:#E67E22; color:white; border:none;
+    border-radius:4px;
 }
-#checkout_btn:hover, #card_rent_btn:hover { background:#2ECC71; }
-#card_rent_btn:disabled { background:#BDC3C7; color:#7F8C8D; }
-#delete_btn { background:#E74C3C; color:white; border:none; font-weight:bold; }
-#delete_btn:hover { background:#EC7063; }
+#checkout_btn:hover, #card_rent_btn:hover { background:#D35400; }
+#card_rent_btn:disabled { background:#CCC; color:#888; }
+#delete_btn { background:#C0392B; color:white; border:none; }
+#delete_btn:hover { background:#E74C3C; }
 QTableWidget {
-    border:1px solid #E8E8E8; border-radius:8px;
-    gridline-color:#F0F0F0; alternate-background-color:#FAFBFC;
+    border:1px solid #DDD; border-radius:4px;
+    gridline-color:#EEE; alternate-background-color:#FAFAFA;
 }
-QTableWidget::item { padding:6px; }
+QTableWidget::item { padding:5px; }
 QHeaderView::section {
-    background:#F8F9FA; border:none;
-    border-bottom:1px solid #E8E8E8;
-    padding:8px; font-weight:bold; color:#566573;
+    background:#F5F5F5; border:none;
+    border-bottom:1px solid #DDD;
+    padding:7px; font-weight:bold; color:#555;
 }
 """
 
@@ -138,12 +139,12 @@ def create_card(eq, on_rent=None):
     card.setFixedWidth(240)
     if eq['available']:
         card.setStyleSheet(
-            '#equip_card{background:white;border:1px solid #E0E0E0;'
-            'border-radius:10px;}')
+            '#equip_card{background:white;border:1px solid #DDD;'
+            'border-radius:6px;}')
     else:
         card.setStyleSheet(
-            '#equip_card{background:#F0F0F0;border:1px solid #D0D0D0;'
-            'border-radius:10px;}')
+            '#equip_card{background:#EBEBEB;border:1px solid #CCC;'
+            'border-radius:6px;}')
 
     lay = QVBoxLayout(card)
     lay.setSpacing(4)
@@ -152,7 +153,7 @@ def create_card(eq, on_rent=None):
     img_label = QLabel()
     img_label.setFixedSize(220, 140)
     img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    img_label.setStyleSheet('background:#F8F9FA;border-radius:6px;')
+    img_label.setStyleSheet('background:#F0F0F0;border-radius:4px;')
     photo_path = os.path.join(BASE_DIR, eq['photo']) if eq['photo'] else ''
     if photo_path and os.path.exists(photo_path):
         pix = QPixmap(photo_path).scaled(
@@ -168,19 +169,19 @@ def create_card(eq, on_rent=None):
     lay.addWidget(name_label)
 
     price_label = QLabel(f'{eq["rental_price_per_day"]:.0f} ₽/сутки')
-    price_label.setStyleSheet('color:#2C3E50;font-size:12px;')
+    price_label.setStyleSheet('color:#E67E22;font-size:12px;font-weight:bold;')
     lay.addWidget(price_label)
 
     point_label = QLabel(f'▶ {eq["point_name"]}')
-    point_label.setStyleSheet('color:#566573;font-size:11px;')
+    point_label.setStyleSheet('color:#777;font-size:11px;')
     lay.addWidget(point_label)
 
     if eq['available']:
         avail_label = QLabel('В наличии')
-        avail_label.setStyleSheet('color:#27AE60;font-size:11px;')
+        avail_label.setStyleSheet('color:#2E7D32;font-size:11px;')
     else:
         avail_label = QLabel('Нет в наличии')
-        avail_label.setStyleSheet('color:#E74C3C;font-size:11px;')
+        avail_label.setStyleSheet('color:#C62828;font-size:11px;')
     lay.addWidget(avail_label)
 
     if on_rent is not None:
@@ -469,7 +470,7 @@ class ClientWindow(QWidget):
 
         total_label = QLabel('')
         total_label.setStyleSheet(
-            'font-weight:bold;font-size:14px;color:#27AE60;')
+            'font-weight:bold;font-size:14px;color:#E67E22;')
         layout.addWidget(total_label)
 
         def calc_total():
