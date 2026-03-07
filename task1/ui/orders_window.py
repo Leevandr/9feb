@@ -1,10 +1,11 @@
 """Окно списка заказов."""
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QScrollArea, QFrame, QMessageBox
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+    QFrame, QMessageBox, QInputDialog
 )
 from PyQt6.QtCore import Qt
 
+from gen.orders_ui import Ui_OrdersForm
 from models.db_manager import load_orders, delete_order
 
 
@@ -15,75 +16,41 @@ class OrdersWindow(QWidget):
         self.parent_window = parent_window
         self.order_form = None
 
+        self.ui = Ui_OrdersForm()
+        self.ui.setupUi(self)
+
         self.setWindowTitle('Заказы')
         self.resize(700, 500)
-        self._build_ui()
-        self.refresh_orders()
 
-    def _build_ui(self):
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(8)
+        # Скрыть кнопки для менеджера
+        if self.role != 'admin':
+            self.ui.add_btn.setVisible(False)
+            self.ui.delete_btn.setVisible(False)
 
-        # Верхняя панель
-        top_panel = QHBoxLayout()
-
-        title = QLabel('Список заказов')
-        title.setStyleSheet(
-            'font-size: 18px; font-weight: bold; color: #2C3E50;')
-        top_panel.addWidget(title)
-
-        top_panel.addStretch()
+        # Подключение сигналов
+        self.ui.back_btn.clicked.connect(self.close)
 
         if self.role == 'admin':
-            add_btn = QPushButton('Добавить заказ')
-            add_btn.setStyleSheet(
-                'background: #27AE60; color: white; border: none; '
-                'border-radius: 6px; padding: 6px 14px; '
-                'font-weight: bold;')
-            add_btn.clicked.connect(self.open_add_order)
-            top_panel.addWidget(add_btn)
+            self.ui.add_btn.clicked.connect(self.open_add_order)
+            self.ui.delete_btn.clicked.connect(
+                self.delete_selected_order)
 
-            del_btn = QPushButton('Удалить заказ')
-            del_btn.setStyleSheet(
-                'background: #E74C3C; color: white; border: none; '
-                'border-radius: 6px; padding: 6px 14px;')
-            del_btn.clicked.connect(self.delete_selected_order)
-            top_panel.addWidget(del_btn)
-
-        back_btn = QPushButton('Назад')
-        back_btn.clicked.connect(self.close)
-        top_panel.addWidget(back_btn)
-
-        layout.addLayout(top_panel)
-
-        # Список заказов
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setStyleSheet('QScrollArea { border: none; }')
-
-        self.scroll_widget = QWidget()
-        self.cards_layout = QVBoxLayout(self.scroll_widget)
-        self.cards_layout.setSpacing(8)
-        self.cards_layout.setContentsMargins(4, 4, 4, 4)
-
-        self.scroll_area.setWidget(self.scroll_widget)
-        layout.addWidget(self.scroll_area)
+        self.refresh_orders()
 
     def refresh_orders(self):
         """Перезагружает список заказов."""
-        # Очистка
-        while self.cards_layout.count():
-            child = self.cards_layout.takeAt(0)
+        layout = self.ui.cards_layout
+        while layout.count():
+            child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
         orders = load_orders()
         for order in orders:
             card = self._create_order_card(order)
-            self.cards_layout.addWidget(card)
+            layout.addWidget(card)
 
-        self.cards_layout.addStretch()
+        layout.addStretch()
 
     def _create_order_card(self, order):
         """Создаёт карточку заказа по макету из ТЗ."""
@@ -98,7 +65,7 @@ class OrdersWindow(QWidget):
         card_layout.setContentsMargins(14, 10, 14, 10)
         card_layout.setSpacing(4)
 
-        # Артикул заказа
+        # Артикул
         article_label = QLabel(
             f'Артикул заказа: #{order["OrderID"]}')
         article_label.setStyleSheet(
@@ -130,7 +97,8 @@ class OrdersWindow(QWidget):
 
         date_label = QLabel(
             f'Дата заказа: {order["OrderDate"]}')
-        date_label.setStyleSheet('font-size: 12px; color: #7F8C8D;')
+        date_label.setStyleSheet(
+            'font-size: 12px; color: #7F8C8D;')
         left_info.addWidget(date_label)
         bottom_layout.addLayout(left_info)
 
@@ -139,12 +107,13 @@ class OrdersWindow(QWidget):
         issue_date = order['IssueDate'] or '—'
         issue_label = QLabel(f'Дата доставки:\n{issue_date}')
         issue_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        issue_label.setStyleSheet('font-size: 12px; color: #7F8C8D;')
+        issue_label.setStyleSheet(
+            'font-size: 12px; color: #7F8C8D;')
         bottom_layout.addWidget(issue_label)
 
         card_layout.addLayout(bottom_layout)
 
-        # Клик по карточке (админ — редактирование)
+        # Клик для админа — редактирование
         if self.role == 'admin':
             card.setCursor(Qt.CursorShape.PointingHandCursor)
             card.mousePressEvent = (
@@ -153,7 +122,8 @@ class OrdersWindow(QWidget):
         return card
 
     def open_add_order(self):
-        if self.order_form is not None and self.order_form.isVisible():
+        if self.order_form is not None \
+                and self.order_form.isVisible():
             QMessageBox.information(
                 self, 'Внимание',
                 'Окно редактирования заказа уже открыто.')
@@ -165,7 +135,8 @@ class OrdersWindow(QWidget):
         self.order_form.show()
 
     def open_edit_order(self, order):
-        if self.order_form is not None and self.order_form.isVisible():
+        if self.order_form is not None \
+                and self.order_form.isVisible():
             QMessageBox.information(
                 self, 'Внимание',
                 'Окно редактирования заказа уже открыто.')
@@ -177,10 +148,10 @@ class OrdersWindow(QWidget):
         self.order_form.show()
 
     def delete_selected_order(self):
-        from PyQt6.QtWidgets import QInputDialog
         orders = load_orders()
         items = [
-            f'#{o["OrderID"]}: {o["Status"]} — {o["DeliveryAddress"]}'
+            f'#{o["OrderID"]}: {o["Status"]} — '
+            f'{o["DeliveryAddress"]}'
             for o in orders
         ]
         if not items:
@@ -199,7 +170,8 @@ class OrdersWindow(QWidget):
         reply = QMessageBox.question(
             self, 'Подтверждение удаления',
             f'Вы уверены, что хотите удалить заказ #{order_id}?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No)
 
         if reply == QMessageBox.StandardButton.Yes:
             delete_order(order_id)

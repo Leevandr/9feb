@@ -2,13 +2,13 @@
 import os
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QComboBox, QScrollArea, QFrame, QGridLayout,
-    QMessageBox, QSizePolicy
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
+    QMessageBox, QInputDialog
 )
-from PyQt6.QtGui import QPixmap, QFont
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
+from gen.main_ui import Ui_MainForm
 from models.db_manager import (
     load_products, load_suppliers, delete_product, product_in_orders
 )
@@ -26,9 +26,48 @@ class MainWindow(QWidget):
         self.product_form = None
         self.orders_window = None
 
+        self.ui = Ui_MainForm()
+        self.ui.setupUi(self)
+
         self.setWindowTitle(f'Каталог товаров — {self._role_name()}')
         self.resize(1000, 700)
-        self._build_ui()
+
+        # Логотип
+        logo_path = os.path.join(BASE_DIR, 'resources', 'logo.png')
+        if os.path.exists(logo_path):
+            pix = QPixmap(logo_path).scaled(
+                120, 36, Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation)
+            self.ui.logo_label.setPixmap(pix)
+
+        # ФИО
+        self.ui.fio_label.setText(self.fio)
+
+        # Скрыть элементы по роли
+        self._apply_role_visibility()
+
+        # Подключение сигналов
+        self.ui.logout_btn.clicked.connect(self.logout)
+
+        if self.role in ('manager', 'admin'):
+            self.ui.sort_combo.addItems([
+                'Без сортировки',
+                'По количеству ↑',
+                'По количеству ↓',
+            ])
+            self.ui.search_edit.textChanged.connect(self.apply_filters)
+            self.ui.supplier_combo.currentIndexChanged.connect(
+                self.apply_filters)
+            self.ui.sort_combo.currentIndexChanged.connect(
+                self.apply_filters)
+            self.ui.orders_btn.clicked.connect(self.open_orders)
+
+        if self.role == 'admin':
+            self.ui.add_product_btn.clicked.connect(
+                self.open_add_product)
+            self.ui.delete_btn.clicked.connect(
+                self.delete_selected_product)
+
         self.refresh_products()
 
     def _role_name(self):
@@ -40,105 +79,21 @@ class MainWindow(QWidget):
         }
         return names.get(self.role, self.role)
 
-    def _build_ui(self):
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(8)
+    def _apply_role_visibility(self):
+        """Скрывает элементы интерфейса в зависимости от роли."""
+        # Фильтры — только менеджер и админ
+        show_filters = self.role in ('manager', 'admin')
+        self.ui.search_edit.setVisible(show_filters)
+        self.ui.supplier_combo.setVisible(show_filters)
+        self.ui.sort_combo.setVisible(show_filters)
 
-        # Верхняя панель
-        top_panel = QHBoxLayout()
+        # Кнопка заказов — менеджер и админ
+        self.ui.orders_btn.setVisible(
+            self.role in ('manager', 'admin'))
 
-        logo_label = QLabel()
-        logo_path = os.path.join(BASE_DIR, 'resources', 'logo.png')
-        if os.path.exists(logo_path):
-            pix = QPixmap(logo_path).scaled(
-                120, 36, Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)
-            logo_label.setPixmap(pix)
-        top_panel.addWidget(logo_label)
-
-        top_panel.addStretch()
-
-        self.fio_label = QLabel(self.fio)
-        self.fio_label.setStyleSheet(
-            'font-weight: bold; font-size: 13px; color: #2C3E50;')
-        top_panel.addWidget(self.fio_label)
-
-        # Кнопка заказов (менеджер, админ)
-        if self.role in ('manager', 'admin'):
-            self.orders_btn = QPushButton('Заказы')
-            self.orders_btn.clicked.connect(self.open_orders)
-            top_panel.addWidget(self.orders_btn)
-
-        # Кнопка добавления товара (админ)
-        if self.role == 'admin':
-            self.add_product_btn = QPushButton('Добавить товар')
-            self.add_product_btn.setObjectName('add_btn')
-            self.add_product_btn.clicked.connect(self.open_add_product)
-            top_panel.addWidget(self.add_product_btn)
-
-        logout_btn = QPushButton('Выход')
-        logout_btn.clicked.connect(self.logout)
-        top_panel.addWidget(logout_btn)
-
-        main_layout.addLayout(top_panel)
-
-        # Панель поиска/фильтрации/сортировки (менеджер, админ)
-        if self.role in ('manager', 'admin'):
-            filter_panel = QHBoxLayout()
-
-            self.search_edit = QLineEdit()
-            self.search_edit.setPlaceholderText(
-                'Поиск по названию, описанию, производителю...')
-            self.search_edit.textChanged.connect(self.apply_filters)
-            filter_panel.addWidget(self.search_edit, 2)
-
-            self.supplier_combo = QComboBox()
-            self.supplier_combo.currentIndexChanged.connect(
-                self.apply_filters)
-            filter_panel.addWidget(self.supplier_combo, 1)
-
-            self.sort_combo = QComboBox()
-            self.sort_combo.addItems([
-                'Без сортировки',
-                'По количеству ↑',
-                'По количеству ↓',
-            ])
-            self.sort_combo.currentIndexChanged.connect(self.apply_filters)
-            filter_panel.addWidget(self.sort_combo, 1)
-
-            main_layout.addLayout(filter_panel)
-
-        # Счётчик товаров
-        self.count_label = QLabel()
-        self.count_label.setStyleSheet('color: #7F8C8D; font-size: 12px;')
-        main_layout.addWidget(self.count_label)
-
-        # Кнопка удаления (админ)
-        if self.role == 'admin':
-            del_panel = QHBoxLayout()
-            del_panel.addStretch()
-            self.delete_btn = QPushButton('Удалить выбранный товар')
-            self.delete_btn.setObjectName('delete_btn')
-            self.delete_btn.setStyleSheet(
-                'background: #E74C3C; color: white; '
-                'border: none; border-radius: 6px; padding: 6px 14px;')
-            self.delete_btn.clicked.connect(self.delete_selected_product)
-            del_panel.addWidget(self.delete_btn)
-            main_layout.addLayout(del_panel)
-
-        # Область прокрутки с карточками
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setStyleSheet('QScrollArea { border: none; }')
-
-        self.scroll_widget = QWidget()
-        self.cards_layout = QVBoxLayout(self.scroll_widget)
-        self.cards_layout.setSpacing(8)
-        self.cards_layout.setContentsMargins(4, 4, 4, 4)
-
-        self.scroll_area.setWidget(self.scroll_widget)
-        main_layout.addWidget(self.scroll_area)
+        # Кнопки админа
+        self.ui.add_product_btn.setVisible(self.role == 'admin')
+        self.ui.delete_btn.setVisible(self.role == 'admin')
 
     def refresh_products(self):
         """Перезагружает товары из БД и обновляет фильтры."""
@@ -150,18 +105,17 @@ class MainWindow(QWidget):
         self.apply_filters()
 
     def _fill_supplier_combo(self):
-        current_text = self.supplier_combo.currentText()
-        self.supplier_combo.blockSignals(True)
-        self.supplier_combo.clear()
-        self.supplier_combo.addItem('Все поставщики')
+        current_text = self.ui.supplier_combo.currentText()
+        self.ui.supplier_combo.blockSignals(True)
+        self.ui.supplier_combo.clear()
+        self.ui.supplier_combo.addItem('Все поставщики')
         suppliers = load_suppliers()
         for s in suppliers:
-            self.supplier_combo.addItem(s['Name'])
-        # Восстановить предыдущий выбор
-        idx = self.supplier_combo.findText(current_text)
+            self.ui.supplier_combo.addItem(s['Name'])
+        idx = self.ui.supplier_combo.findText(current_text)
         if idx >= 0:
-            self.supplier_combo.setCurrentIndex(idx)
-        self.supplier_combo.blockSignals(False)
+            self.ui.supplier_combo.setCurrentIndex(idx)
+        self.ui.supplier_combo.blockSignals(False)
 
     def apply_filters(self):
         """Применяет поиск, фильтрацию и сортировку."""
@@ -169,7 +123,7 @@ class MainWindow(QWidget):
 
         if self.role in ('manager', 'admin'):
             # Поиск
-            text = self.search_edit.text().strip().lower()
+            text = self.ui.search_edit.text().strip().lower()
             if text:
                 result = [
                     p for p in result
@@ -181,7 +135,7 @@ class MainWindow(QWidget):
                 ]
 
             # Фильтр по поставщику
-            supplier = self.supplier_combo.currentText()
+            supplier = self.ui.supplier_combo.currentText()
             if supplier and supplier != 'Все поставщики':
                 result = [
                     p for p in result
@@ -189,7 +143,7 @@ class MainWindow(QWidget):
                 ]
 
             # Сортировка
-            sort_idx = self.sort_combo.currentIndex()
+            sort_idx = self.ui.sort_combo.currentIndex()
             if sort_idx == 1:
                 result.sort(key=lambda p: p['StockQuantity'])
             elif sort_idx == 2:
@@ -200,18 +154,18 @@ class MainWindow(QWidget):
 
     def _fill_cards(self, products):
         """Заполняет список карточками товаров."""
-        # Очистка
-        while self.cards_layout.count():
-            child = self.cards_layout.takeAt(0)
+        layout = self.ui.cards_layout
+        while layout.count():
+            child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
         for product in products:
             card = self._create_product_card(product)
-            self.cards_layout.addWidget(card)
+            layout.addWidget(card)
 
-        self.cards_layout.addStretch()
-        self.count_label.setText(f'Товаров: {len(products)}')
+        layout.addStretch()
+        self.ui.count_label.setText(f'Товаров: {len(products)}')
 
     def _create_product_card(self, product):
         """Создаёт виджет-карточку товара по макету из ТЗ."""
@@ -219,7 +173,7 @@ class MainWindow(QWidget):
         card.setObjectName('product_card')
         card.setFrameShape(QFrame.Shape.StyledPanel)
 
-        # Определяем цвет фона
+        # Цвет фона по правилам подсветки
         bg_color = '#FFFFFF'
         if product['StockQuantity'] == 0:
             bg_color = '#ADD8E6'
@@ -234,7 +188,7 @@ class MainWindow(QWidget):
         card_layout.setContentsMargins(14, 10, 14, 10)
         card_layout.setSpacing(4)
 
-        # Строка 1: Категория | Наименование
+        # Категория | Наименование
         header = QLabel(
             f'{product["CategoryName"]}  |  {product["Name"]}')
         header.setStyleSheet(
@@ -242,19 +196,19 @@ class MainWindow(QWidget):
         header.setWordWrap(True)
         card_layout.addWidget(header)
 
-        # Строка 2: Описание
+        # Описание
         desc = QLabel(product['Description'] or '')
         desc.setStyleSheet('color: #7F8C8D; font-size: 12px;')
         desc.setWordWrap(True)
         card_layout.addWidget(desc)
 
-        # Строка 3: Производитель
+        # Производитель
         mfr_label = QLabel(
             f'Производитель: {product["ManufacturerName"]}')
         mfr_label.setStyleSheet('font-size: 12px;')
         card_layout.addWidget(mfr_label)
 
-        # Строка 4: Фото + информация справа
+        # Фото + информация справа
         content_layout = QHBoxLayout()
         content_layout.setSpacing(14)
 
@@ -272,7 +226,7 @@ class MainWindow(QWidget):
         img_label.setPixmap(pix)
         content_layout.addWidget(img_label)
 
-        # Информация справа от фото
+        # Информация справа
         info_layout = QVBoxLayout()
         info_layout.setSpacing(4)
 
@@ -301,8 +255,7 @@ class MainWindow(QWidget):
                 'font-size: 13px; font-weight: bold;')
         info_layout.addWidget(price_label)
 
-        unit_label = QLabel(
-            f'Ед. изм.: {product["Unit"]}')
+        unit_label = QLabel(f'Ед. изм.: {product["Unit"]}')
         unit_label.setStyleSheet('font-size: 12px;')
         info_layout.addWidget(unit_label)
 
@@ -314,14 +267,15 @@ class MainWindow(QWidget):
         info_layout.addStretch()
         content_layout.addLayout(info_layout)
 
-        # Скидка (бейдж справа)
+        # Бейдж скидки
         if discount > 0:
             discount_label = QLabel(f'-{discount}%')
             discount_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             discount_label.setFixedSize(60, 30)
             discount_label.setStyleSheet(
                 'background: #E74C3C; color: white; '
-                'border-radius: 6px; font-weight: bold; font-size: 14px;')
+                'border-radius: 6px; font-weight: bold; '
+                'font-size: 14px;')
             content_layout.addWidget(
                 discount_label,
                 alignment=Qt.AlignmentFlag.AlignTop)
@@ -329,12 +283,11 @@ class MainWindow(QWidget):
         content_layout.addStretch()
         card_layout.addLayout(content_layout)
 
-        # Для администратора — клик по карточке = редактирование
+        # Клик для админа — редактирование
         if self.role == 'admin':
             card.setCursor(Qt.CursorShape.PointingHandCursor)
             card.mousePressEvent = (
                 lambda event, p=product: self.open_edit_product(p))
-            card.setProperty('product_id', product['ProductID'])
 
         return card
 
@@ -367,13 +320,6 @@ class MainWindow(QWidget):
         self.product_form.show()
 
     def delete_selected_product(self):
-        """Удаление товара — нужно выбрать карточку."""
-        # Находим карточку, на которую последний раз кликнули
-        # Используем фокус
-        focused = self.scroll_widget.focusWidget()
-
-        # Альтернативный подход: показать диалог выбора
-        from PyQt6.QtWidgets import QInputDialog
         products = load_products()
         items = [f'{p["ProductID"]}: {p["Name"]}' for p in products]
         if not items:
@@ -401,7 +347,8 @@ class MainWindow(QWidget):
             self, 'Подтверждение удаления',
             f'Вы уверены, что хотите удалить товар\n'
             f'"{product_name}"?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No)
 
         if reply == QMessageBox.StandardButton.Yes:
             delete_product(product_id)
