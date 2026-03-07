@@ -22,7 +22,7 @@ class Ui_OrdersForm(object):
         self.title_label = QtWidgets.QLabel(parent=OrdersForm)
         self.title_label.setObjectName("title_label")
         self.top_panel.addWidget(self.title_label)
-        spacerItem = QtWidgets.QSpacerItem(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.top_panel.addItem(spacerItem)
         self.add_btn = QtWidgets.QPushButton(parent=OrdersForm)
         self.add_btn.setObjectName("add_btn")

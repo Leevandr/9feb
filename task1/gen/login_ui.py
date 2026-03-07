@@ -43,7 +43,7 @@ class Ui_LoginForm(object):
         self.guest_btn.setObjectName("guest_btn")
         self.btn_layout.addWidget(self.guest_btn)
         self.main_layout.addLayout(self.btn_layout)
-        spacerItem1 = QtWidgets.QSpacerItem(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout.addItem(spacerItem1)
 
         self.retranslateUi(LoginForm)
