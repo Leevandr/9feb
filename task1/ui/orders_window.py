@@ -1,4 +1,3 @@
-"""Окно списка заказов."""
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QFrame, QMessageBox, QInputDialog
@@ -22,12 +21,10 @@ class OrdersWindow(QWidget):
         self.setWindowTitle('Заказы')
         self.resize(700, 500)
 
-        # Скрыть кнопки для менеджера
         if self.role != 'admin':
             self.ui.add_btn.setVisible(False)
             self.ui.delete_btn.setVisible(False)
 
-        # Подключение сигналов
         self.ui.back_btn.clicked.connect(self.close)
 
         if self.role == 'admin':
@@ -38,7 +35,6 @@ class OrdersWindow(QWidget):
         self.refresh_orders()
 
     def refresh_orders(self):
-        """Перезагружает список заказов."""
         layout = self.ui.cards_layout
         while layout.count():
             child = layout.takeAt(0)
@@ -53,7 +49,6 @@ class OrdersWindow(QWidget):
         layout.addStretch()
 
     def _create_order_card(self, order):
-        """Создаёт карточку заказа по макету из ТЗ."""
         card = QFrame()
         card.setObjectName('order_card')
         card.setFrameShape(QFrame.Shape.StyledPanel)
@@ -65,14 +60,12 @@ class OrdersWindow(QWidget):
         card_layout.setContentsMargins(14, 10, 14, 10)
         card_layout.setSpacing(4)
 
-        # Артикул
         article_label = QLabel(
             f'Артикул заказа: #{order["OrderID"]}')
         article_label.setStyleSheet(
             'font-weight: bold; font-size: 14px; color: #2C3E50;')
         card_layout.addWidget(article_label)
 
-        # Статус
         status = order['Status']
         status_colors = {
             'Новый': '#3498DB',
@@ -85,7 +78,6 @@ class OrdersWindow(QWidget):
             f'color: {color}; font-weight: bold; font-size: 13px;')
         card_layout.addWidget(status_label)
 
-        # Адрес и даты
         bottom_layout = QHBoxLayout()
 
         left_info = QVBoxLayout()
@@ -113,7 +105,6 @@ class OrdersWindow(QWidget):
 
         card_layout.addLayout(bottom_layout)
 
-        # Клик для админа — редактирование
         if self.role == 'admin':
             card.setCursor(Qt.CursorShape.PointingHandCursor)
             card.mousePressEvent = (

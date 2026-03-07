@@ -1,4 +1,3 @@
-"""Форма добавления / редактирования товара."""
 import os
 
 from PyQt6.QtWidgets import (
@@ -33,7 +32,6 @@ class ProductForm(QWidget):
         self.setWindowTitle(title)
         self.setFixedSize(500, 650)
 
-        # Заполнение комбобоксов
         self.categories = load_categories()
         for c in self.categories:
             self.ui.category_combo.addItem(
@@ -49,12 +47,10 @@ class ProductForm(QWidget):
             self.ui.supplier_combo.addItem(
                 s['Name'], s['SupplierID'])
 
-        # Скрыть ID при добавлении
         if not self.is_edit:
             self.ui.id_text_label.setVisible(False)
             self.ui.id_label.setVisible(False)
 
-        # Подключение сигналов
         self.ui.upload_btn.clicked.connect(self.browse_photo)
         self.ui.cancel_btn.clicked.connect(self.close)
         self.ui.save_btn.clicked.connect(self.save)
@@ -65,7 +61,6 @@ class ProductForm(QWidget):
         self._update_photo_preview()
 
     def _fill_from_product(self):
-        """Заполняет поля формы данными товара."""
         p = self.product
         self.ui.id_label.setText(str(p['ProductID']))
         self.ui.name_edit.setText(p['Name'])
@@ -91,7 +86,6 @@ class ProductForm(QWidget):
         self.ui.discount_spin.setValue(p['Discount'])
 
     def _update_photo_preview(self):
-        """Обновляет превью фото."""
         if self.new_image_path:
             path = self.new_image_path
         elif self.is_edit and self.product.get('ImagePath'):
@@ -130,7 +124,6 @@ class ProductForm(QWidget):
                 'Поле "Единица измерения" не может быть пустым.')
             return
 
-        # Обработка изображения
         image_path = None
         if self.is_edit:
             image_path = self.product.get('ImagePath')
@@ -139,14 +132,12 @@ class ProductForm(QWidget):
             images_dir = os.path.join(BASE_DIR, 'images')
             os.makedirs(images_dir, exist_ok=True)
 
-            # Удаляем старое фото при замене
             if self.is_edit and self.product.get('ImagePath'):
                 old_path = os.path.join(
                     BASE_DIR, self.product['ImagePath'])
                 if os.path.exists(old_path):
                     os.remove(old_path)
 
-            # Масштабируем до 300x200 и сохраняем
             ext = os.path.splitext(self.new_image_path)[1]
             filename = f'{name.replace(" ", "_").lower()}{ext}'
             dest_path = os.path.join(images_dir, filename)

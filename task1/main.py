@@ -1,7 +1,3 @@
-"""
-TechShop — Система управления продажей компьютерной техники.
-Точка входа приложения.
-"""
 import sys
 import os
 
@@ -11,7 +7,6 @@ from PyQt6.QtGui import QIcon
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'database.db')
 
-# Глобальные стили приложения
 APP_STYLE = """
 QWidget {
     font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
@@ -95,7 +90,6 @@ QScrollArea {
 
 
 if __name__ == '__main__':
-    # Инициализация БД при первом запуске
     if not os.path.exists(DB_PATH):
         from init_db import create_database, generate_placeholder_image, generate_logo
         create_database()
@@ -105,7 +99,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyleSheet(APP_STYLE)
 
-    # Иконка приложения
     icon_path = os.path.join(BASE_DIR, 'resources', 'logo.png')
     if os.path.exists(icon_path):
         app.setWindowIcon(QIcon(icon_path))

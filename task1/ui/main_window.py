@@ -1,4 +1,3 @@
-"""Главное окно — список товаров."""
 import os
 
 from PyQt6.QtWidgets import (
@@ -32,7 +31,6 @@ class MainWindow(QWidget):
         self.setWindowTitle(f'Каталог товаров — {self._role_name()}')
         self.resize(1000, 700)
 
-        # Логотип
         logo_path = os.path.join(BASE_DIR, 'resources', 'logo.png')
         if os.path.exists(logo_path):
             pix = QPixmap(logo_path).scaled(
@@ -40,13 +38,10 @@ class MainWindow(QWidget):
                 Qt.TransformationMode.SmoothTransformation)
             self.ui.logo_label.setPixmap(pix)
 
-        # ФИО
         self.ui.fio_label.setText(self.fio)
 
-        # Скрыть элементы по роли
         self._apply_role_visibility()
 
-        # Подключение сигналов
         self.ui.logout_btn.clicked.connect(self.logout)
 
         if self.role in ('manager', 'admin'):
@@ -80,23 +75,18 @@ class MainWindow(QWidget):
         return names.get(self.role, self.role)
 
     def _apply_role_visibility(self):
-        """Скрывает элементы интерфейса в зависимости от роли."""
-        # Фильтры — только менеджер и админ
         show_filters = self.role in ('manager', 'admin')
         self.ui.search_edit.setVisible(show_filters)
         self.ui.supplier_combo.setVisible(show_filters)
         self.ui.sort_combo.setVisible(show_filters)
 
-        # Кнопка заказов — менеджер и админ
         self.ui.orders_btn.setVisible(
             self.role in ('manager', 'admin'))
 
-        # Кнопки админа
         self.ui.add_product_btn.setVisible(self.role == 'admin')
         self.ui.delete_btn.setVisible(self.role == 'admin')
 
     def refresh_products(self):
-        """Перезагружает товары из БД и обновляет фильтры."""
         self.all_products = load_products()
 
         if self.role in ('manager', 'admin'):
@@ -118,11 +108,9 @@ class MainWindow(QWidget):
         self.ui.supplier_combo.blockSignals(False)
 
     def apply_filters(self):
-        """Применяет поиск, фильтрацию и сортировку."""
         result = list(self.all_products)
 
         if self.role in ('manager', 'admin'):
-            # Поиск
             text = self.ui.search_edit.text().strip().lower()
             if text:
                 result = [
@@ -134,7 +122,6 @@ class MainWindow(QWidget):
                     or text in p['CategoryName'].lower()
                 ]
 
-            # Фильтр по поставщику
             supplier = self.ui.supplier_combo.currentText()
             if supplier and supplier != 'Все поставщики':
                 result = [
@@ -142,7 +129,6 @@ class MainWindow(QWidget):
                     if p['SupplierName'] == supplier
                 ]
 
-            # Сортировка
             sort_idx = self.ui.sort_combo.currentIndex()
             if sort_idx == 1:
                 result.sort(key=lambda p: p['StockQuantity'])
@@ -153,7 +139,6 @@ class MainWindow(QWidget):
         self._fill_cards(result)
 
     def _fill_cards(self, products):
-        """Заполняет список карточками товаров."""
         layout = self.ui.cards_layout
         while layout.count():
             child = layout.takeAt(0)
@@ -168,12 +153,10 @@ class MainWindow(QWidget):
         self.ui.count_label.setText(f'Товаров: {len(products)}')
 
     def _create_product_card(self, product):
-        """Создаёт виджет-карточку товара по макету из ТЗ."""
         card = QFrame()
         card.setObjectName('product_card')
         card.setFrameShape(QFrame.Shape.StyledPanel)
 
-        # Цвет фона по правилам подсветки
         bg_color = '#FFFFFF'
         if product['StockQuantity'] == 0:
             bg_color = '#ADD8E6'
@@ -188,7 +171,6 @@ class MainWindow(QWidget):
         card_layout.setContentsMargins(14, 10, 14, 10)
         card_layout.setSpacing(4)
 
-        # Категория | Наименование
         header = QLabel(
             f'{product["CategoryName"]}  |  {product["Name"]}')
         header.setStyleSheet(
@@ -196,23 +178,19 @@ class MainWindow(QWidget):
         header.setWordWrap(True)
         card_layout.addWidget(header)
 
-        # Описание
         desc = QLabel(product['Description'] or '')
         desc.setStyleSheet('color: #7F8C8D; font-size: 12px;')
         desc.setWordWrap(True)
         card_layout.addWidget(desc)
 
-        # Производитель
         mfr_label = QLabel(
             f'Производитель: {product["ManufacturerName"]}')
         mfr_label.setStyleSheet('font-size: 12px;')
         card_layout.addWidget(mfr_label)
 
-        # Фото + информация справа
         content_layout = QHBoxLayout()
         content_layout.setSpacing(14)
 
-        # Фото
         img_label = QLabel()
         img_label.setFixedSize(300, 200)
         img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -226,7 +204,6 @@ class MainWindow(QWidget):
         img_label.setPixmap(pix)
         content_layout.addWidget(img_label)
 
-        # Информация справа
         info_layout = QVBoxLayout()
         info_layout.setSpacing(4)
 
@@ -235,7 +212,6 @@ class MainWindow(QWidget):
         supplier_label.setStyleSheet('font-size: 12px;')
         info_layout.addWidget(supplier_label)
 
-        # Цена с учётом скидки
         price = product['Price']
         discount = product['Discount']
         if discount > 0:
@@ -267,7 +243,6 @@ class MainWindow(QWidget):
         info_layout.addStretch()
         content_layout.addLayout(info_layout)
 
-        # Бейдж скидки
         if discount > 0:
             discount_label = QLabel(f'-{discount}%')
             discount_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -283,15 +258,12 @@ class MainWindow(QWidget):
         content_layout.addStretch()
         card_layout.addLayout(content_layout)
 
-        # Клик для админа — редактирование
         if self.role == 'admin':
             card.setCursor(Qt.CursorShape.PointingHandCursor)
             card.mousePressEvent = (
                 lambda event, p=product: self.open_edit_product(p))
 
         return card
-
-    # ---- Действия ----
 
     def open_add_product(self):
         if self.product_form is not None and self.product_form.isVisible():

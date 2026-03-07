@@ -1,4 +1,3 @@
-"""Окно авторизации."""
 import os
 
 from PyQt6.QtWidgets import QWidget, QMessageBox
@@ -18,7 +17,6 @@ class LoginWindow(QWidget):
         self.setWindowTitle('Авторизация — TechShop')
         self.main_window = None
 
-        # Логотип
         logo_path = os.path.join(BASE_DIR, 'resources', 'logo.png')
         if os.path.exists(logo_path):
             pix = QPixmap(logo_path)
@@ -57,7 +55,6 @@ class LoginWindow(QWidget):
         self.hide()
 
     def on_logout(self):
-        """Вызывается при выходе из учётной записи."""
         self.ui.login_edit.clear()
         self.ui.password_edit.clear()
         self.show()

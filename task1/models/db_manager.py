@@ -1,4 +1,3 @@
-"""Модуль работы с базой данных (CRUD-операции)."""
 import sqlite3
 import os
 
@@ -13,10 +12,7 @@ def get_connection():
     return conn
 
 
-# ---- Пользователи ----
-
 def authenticate(login, password):
-    """Возвращает dict пользователя или None."""
     conn = get_connection()
     row = conn.execute(
         'SELECT * FROM Users WHERE Login = ? AND Password = ?',
@@ -26,10 +22,7 @@ def authenticate(login, password):
     return dict(row) if row else None
 
 
-# ---- Товары ----
-
 def load_products():
-    """Загружает все товары с названиями категорий, производителей, поставщиков."""
     conn = get_connection()
     rows = conn.execute('''
         SELECT p.*, c.Name AS CategoryName,
@@ -54,7 +47,6 @@ def get_product_by_id(product_id):
 
 
 def add_product(data):
-    """Добавляет товар. data — dict с полями таблицы Products."""
     conn = get_connection()
     conn.execute('''
         INSERT INTO Products
@@ -90,7 +82,6 @@ def update_product(product_id, data):
 
 
 def delete_product(product_id):
-    """Удаляет товар. Возвращает True если успешно, False если товар в заказе."""
     conn = get_connection()
     in_order = conn.execute(
         'SELECT COUNT(*) FROM OrderItems WHERE ProductID = ?',
@@ -116,8 +107,6 @@ def product_in_orders(product_id):
     return count > 0
 
 
-# ---- Справочники ----
-
 def load_categories():
     conn = get_connection()
     rows = conn.execute('SELECT * FROM Categories ORDER BY Name').fetchall()
@@ -139,8 +128,6 @@ def load_suppliers():
     conn.close()
     return [dict(r) for r in rows]
 
-
-# ---- Заказы ----
 
 def load_orders():
     conn = get_connection()

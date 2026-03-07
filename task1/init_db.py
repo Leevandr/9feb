@@ -1,7 +1,3 @@
-"""
-Скрипт инициализации базы данных.
-Создаёт таблицы и заполняет их начальными данными из Приложения 2.
-"""
 import sqlite3
 import os
 
@@ -74,7 +70,6 @@ def create_database():
         );
     ''')
 
-    # Пользователи
     cur.executemany(
         'INSERT OR IGNORE INTO Users (UserID, Login, Password, Role, FIO) '
         'VALUES (?, ?, ?, ?, ?)',
@@ -86,7 +81,6 @@ def create_database():
         ]
     )
 
-    # Категории
     cur.executemany(
         'INSERT OR IGNORE INTO Categories (CategoryID, Name) VALUES (?, ?)',
         [
@@ -97,7 +91,6 @@ def create_database():
         ]
     )
 
-    # Производители
     cur.executemany(
         'INSERT OR IGNORE INTO Manufacturers (ManufacturerID, Name) '
         'VALUES (?, ?)',
@@ -110,7 +103,6 @@ def create_database():
         ]
     )
 
-    # Поставщики
     cur.executemany(
         'INSERT OR IGNORE INTO Suppliers (SupplierID, Name) VALUES (?, ?)',
         [
@@ -121,7 +113,6 @@ def create_database():
         ]
     )
 
-    # Товары
     cur.executemany(
         'INSERT OR IGNORE INTO Products '
         '(ProductID, Name, CategoryID, Description, ManufacturerID, '
@@ -152,7 +143,6 @@ def create_database():
         ]
     )
 
-    # Заказы
     cur.executemany(
         'INSERT OR IGNORE INTO Orders '
         '(OrderID, UserID, Status, DeliveryAddress, OrderDate, IssueDate) '
@@ -170,7 +160,6 @@ def create_database():
         ]
     )
 
-    # Состав заказов
     cur.executemany(
         'INSERT OR IGNORE INTO OrderItems '
         '(ItemID, OrderID, ProductID, Quantity) VALUES (?, ?, ?, ?)',
@@ -188,7 +177,6 @@ def create_database():
 
 
 def generate_placeholder_image():
-    """Создаёт картинку-заглушку picture.png если её нет."""
     path = os.path.join(BASE_DIR, 'resources', 'picture.png')
     if os.path.exists(path):
         return
@@ -217,7 +205,6 @@ def generate_placeholder_image():
 
 
 def generate_logo():
-    """Создаёт логотип компании если его нет."""
     path = os.path.join(BASE_DIR, 'resources', 'logo.png')
     if os.path.exists(path):
         return

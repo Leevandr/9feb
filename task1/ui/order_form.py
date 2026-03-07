@@ -1,4 +1,3 @@
-"""Форма добавления / редактирования заказа."""
 from PyQt6.QtWidgets import QWidget, QMessageBox
 from PyQt6.QtCore import QDate
 
@@ -21,12 +20,10 @@ class OrderForm(QWidget):
         self.setWindowTitle(title)
         self.setFixedSize(450, 350)
 
-        # Скрыть ID при добавлении
         if not self.is_edit:
             self.ui.id_text_label.setVisible(False)
             self.ui.id_label.setVisible(False)
 
-        # Подключение сигналов
         self.ui.issue_date_check.toggled.connect(
             self.ui.issue_date_edit.setEnabled)
         self.ui.cancel_btn.clicked.connect(self.close)
@@ -36,7 +33,6 @@ class OrderForm(QWidget):
             self._fill_from_order()
 
     def _fill_from_order(self):
-        """Заполняет поля формы данными заказа."""
         o = self.order
         self.ui.id_label.setText(str(o['OrderID']))
 
