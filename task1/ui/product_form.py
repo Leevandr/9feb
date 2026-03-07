@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
-from gen.product_form_ui import Ui_ProductForm
+from gen.product_form_ui import Ui_ProductFormUI as Ui_ProductForm
 from models.db_manager import (
     load_categories, load_manufacturers, load_suppliers,
     add_product, update_product

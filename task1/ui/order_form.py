@@ -2,7 +2,7 @@
 from PyQt6.QtWidgets import QWidget, QMessageBox
 from PyQt6.QtCore import QDate
 
-from gen.order_form_ui import Ui_OrderForm
+from gen.order_form_ui import Ui_OrderFormUI as Ui_OrderForm
 from models.db_manager import add_order, update_order
 
 
