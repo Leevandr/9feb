@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainForm</class>
+ <widget class="QWidget" name="MainForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1050</width><height>720</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Каталог мебели</string>
+  </property>
+  <layout class="QVBoxLayout" name="main_layout">
+   <property name="spacing"><number>8</number></property>
+   <property name="margin"><number>10</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="top_panel">
+     <item>
+      <widget class="QLabel" name="logo_label"/>
+     </item>
+     <item>
+      <spacer name="top_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="fio_label"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="orders_btn">
+       <property name="text"><string>Заказы</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add_product_btn">
+       <property name="text"><string>Добавить товар</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="logout_btn">
+       <property name="text"><string>Выход</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="filter_panel">
+     <item>
+      <widget class="QLineEdit" name="search_edit">
+       <property name="placeholderText">
+        <string>Поиск по названию, описанию, материалу...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="manufacturer_combo"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="sort_combo"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="count_label"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="action_panel">
+     <item>
+      <spacer name="action_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="delete_btn">
+       <property name="text"><string>Удалить выбранный товар</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scroll_area">
+     <property name="widgetResizable"><bool>true</bool></property>
+     <widget class="QWidget" name="scroll_widget">
+      <layout class="QVBoxLayout" name="cards_layout">
+       <property name="spacing"><number>10</number></property>
+       <property name="margin"><number>4</number></property>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

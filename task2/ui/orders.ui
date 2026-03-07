@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OrdersForm</class>
+ <widget class="QWidget" name="OrdersForm">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>720</width><height>520</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>Заказы</string>
+  </property>
+  <layout class="QVBoxLayout" name="main_layout">
+   <property name="spacing"><number>8</number></property>
+   <property name="margin"><number>10</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="top_panel">
+     <item>
+      <widget class="QLabel" name="title_label">
+       <property name="text"><string>Список заказов</string></property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="top_spacer">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add_btn">
+       <property name="text"><string>Добавить заказ</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="delete_btn">
+       <property name="text"><string>Удалить заказ</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="back_btn">
+       <property name="text"><string>Назад</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scroll_area">
+     <property name="widgetResizable"><bool>true</bool></property>
+     <widget class="QWidget" name="scroll_widget">
+      <layout class="QVBoxLayout" name="cards_layout">
+       <property name="spacing"><number>10</number></property>
+       <property name="margin"><number>4</number></property>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
